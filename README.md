@@ -1,7 +1,7 @@
 # CCAR-P Practice Exams
 
 Hard, scenario-based practice exams for the **Claude Certified Architect – Professional (CCAR-P)**, served as a static site at
-<https://rvergis-claude-architect-professional.pages.dev>.
+<https://claude-architect-professional.bettr.fyi> (also <https://rvergis-claude-architect-professional.pages.dev>).
 
 Unofficial study material, not affiliated with or endorsed by Anthropic. Every question is original and written against the public CCAR-P exam blueprint (Exam Guide v1.0, July 2026). None are real exam items.
 
@@ -71,7 +71,7 @@ The site is plain static files with no build step.
 
 1. In the Cloudflare dashboard, go to **Workers & Pages → Create → Pages → Connect to Git** and pick this repository.
 2. Leave the framework preset at **None** and the build command empty, and set the build output directory to `public`.
-3. Deploy. The site is served at `rvergis-claude-architect-professional.pages.dev`. To use a custom domain later, add it under **Custom domains** in the Pages project.
+3. Deploy. The site is served at `rvergis-claude-architect-professional.pages.dev`, and the custom domain `claude-architect-professional.bettr.fyi` is set up under **Custom domains** in the Pages project.
 
 Every push to `main` then redeploys, and pull requests get preview URLs.
 
