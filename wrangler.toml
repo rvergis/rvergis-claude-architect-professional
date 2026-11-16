@@ -1,0 +1,9 @@
+# Cloudflare Pages configuration. Pages reads this file on every deploy.
+name = "rvergis-claude-architect-professional"
+pages_build_output_dir = "./public"
+compatibility_date = "2026-11-16"
+
+# Stores in-progress exams under 4-letter resume codes (see functions/api/progress).
+[[kv_namespaces]]
+binding = "PROGRESS"
+id = "707d9eca49b74a9c90f9bb9792cf6555"

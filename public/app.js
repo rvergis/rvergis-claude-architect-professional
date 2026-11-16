@@ -20,6 +20,81 @@
   }
   function saveProgress() {
     var d = load(); d.inProgress = state.exam && !state.exam.submitted ? state.exam : null; save(d);
+    scheduleSync();
+  }
+
+  /* ---------- resume codes (cross-device) ---------- */
+  /* The server keeps a compact copy of the exam under a 4-letter code: question IDs, option order,
+     answers and the clock. The full exam is rebuilt from the question bank on the other device. */
+  var API = "api/progress";
+  var syncTimer = null;
+  function compact(ex) {
+    var byId = bankById();
+    return {
+      v: 1, title: ex.title, mode: ex.mode, form: ex.form, study: ex.study, minutes: ex.minutes, timed: !!ex.timed,
+      elapsedBefore: elapsed(ex), current: ex.current, savedAt: Date.now(),
+      items: ex.items.map(function (it) {
+        var q = byId[it.id];
+        return { id: it.id, o: it.options.map(function (t) { return q ? q.options.indexOf(t) : -1; }), c: it.chosen, f: it.flagged ? 1 : 0, k: it.checked ? 1 : 0 };
+      })
+    };
+  }
+  function expand(st, code) {
+    var byId = bankById();
+    var items = st.items.filter(function (x) { return byId[x.id]; }).map(function (x) {
+      var q = byId[x.id], n = q.options.length;
+      var perm = x.o && x.o.length === n && x.o.every(function (i) { return i >= 0 && i < n; }) ? x.o : Array.from({ length: n }, function (_, i) { return i; });
+      var it = itemFromPerm(q, perm);
+      it.chosen = (x.c || []).filter(function (i) { return i >= 0 && i < n; }); it.flagged = !!x.f; it.checked = !!x.k;
+      return it;
+    });
+    return {
+      title: st.title, mode: st.mode, form: st.form, study: !!st.study, minutes: st.minutes || 0, timed: !!st.timed,
+      startedAt: null, elapsedBefore: st.elapsedBefore || 0, items: items,
+      current: Math.min(st.current || 0, items.length - 1), submitted: false, code: code
+    };
+  }
+  var _byId = null;
+  function bankById() { if (!_byId) { _byId = {}; BANK.questions.forEach(function (q) { _byId[q.id] = q; }); } return _byId; }
+  function scheduleSync() {
+    var ex = state.exam;
+    if (!ex || ex.submitted || !ex.code) return;
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(function () { syncNow(); }, 1500);
+  }
+  function syncNow() {
+    var ex = state.exam;
+    if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; }
+    if (!ex || ex.submitted || !ex.code) return;
+    try {
+      fetch(API + "/" + ex.code, { method: "PUT", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(compact(ex)) }).catch(function () {});
+    } catch (e) { /* offline: the local copy is still saved */ }
+  }
+  function requestCode(ex) {
+    if (!window.fetch || ex.mode === "drill") return;
+    fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(compact(ex)) })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (res) {
+        if (!res || !res.code || state.exam !== ex || ex.submitted) return;
+        ex.code = res.code; saveProgress();
+        if (state.view === "exam") renderExam();
+      }).catch(function () { /* no code; the exam still works on this device */ });
+  }
+  function forgetCode(code) {
+    if (!code) return;
+    try { fetch(API + "/" + code, { method: "DELETE", keepalive: true }).catch(function () {}); } catch (e) {}
+  }
+  function loadByCode(code, done) {
+    code = String(code || "").trim().toUpperCase();
+    if (!/^[A-Z]{4}$/.test(code)) { done("Enter the 4-letter code shown at the top of your exam."); return; }
+    fetch(API + "/" + code, { cache: "no-store" })
+      .then(function (r) { if (r.status === 404) throw new Error("nf"); if (!r.ok) throw new Error("x"); return r.json(); })
+      .then(function (st) {
+        var ex = expand(st, code);
+        if (!ex.items.length) { done("That exam couldn't be loaded."); return; }
+        state.exam = ex; resumeClock(ex); saveProgress(); renderExam(); startTimer(); done(null);
+      })
+      .catch(function (e) { done(e.message === "nf" ? "No exam found for " + code + ". Codes expire 30 days after the last save." : "Couldn't reach the server. Check your connection and try again."); });
   }
   function addHistory(entry) {
     var d = load(); d.history = d.history || []; d.history.unshift(entry); d.history = d.history.slice(0, 200);
@@ -48,6 +123,9 @@
   /* ---------- exam construction ---------- */
   function buildItem(q, r) {
     var n = q.options.length, perm = shuffle(Array.from({ length: n }, function (_, i) { return i; }), r);
+    return itemFromPerm(q, perm);
+  }
+  function itemFromPerm(q, perm) {
     var oldToNew = {}; perm.forEach(function (oldIdx, newIdx) { oldToNew[oldIdx] = newIdx; });
     return {
       id: q.id, domain: q.domain, select: q.select, stem: q.stem,
@@ -107,7 +185,7 @@
   document.addEventListener("visibilitychange", function () {
     var ex = state.exam;
     if (state.view !== "exam" || !ex || ex.submitted) return;
-    if (document.hidden) { pauseClock(ex); saveProgress(); } else { resumeClock(ex); }
+    if (document.hidden) { pauseClock(ex); saveProgress(); syncNow(); } else { resumeClock(ex); }
   });
   function startTimer() {
     stopTimer();
@@ -135,6 +213,10 @@
 
     var html = '<h1>Claude Certified Architect – Professional<br><span class="muted">Hard practice exams</span></h1>' +
       '<p class="muted">Each exam has 63 scenario-based items drawn at the official CCAR-P domain weighting, with single-answer and multiple-response questions, timed at 120 minutes. Questions are written to be harder than the real exam.</p>';
+
+    html += '<div class="card"><div class="row"><div><h3>Continue on this device</h3><div class="muted small">Type the 4-letter code shown at the top of an exam you started elsewhere.</div></div><div class="spacer"></div>' +
+      '<input type="text" id="resumeCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD" style="width:6.5em;text-transform:uppercase;letter-spacing:.15em;text-align:center">' +
+      '<button class="btn primary" id="loadCode">Continue</button></div><div class="muted small" id="codeMsg" role="status"></div></div>';
 
     if (d.inProgress) {
       html += '<div class="card"><div class="row"><div><h3>Resume: ' + esc(d.inProgress.title) + '</h3><div class="muted small">' +
@@ -181,7 +263,16 @@
     bind("startRandom", function () { start({ mode: "random" }); });
     bind("startDrill", function () { start({ mode: "drill", domain: parseInt(val("drillDomain"), 10), count: Math.max(1, parseInt(val("drillCount"), 10) || 10), study: true, untimed: true }); });
     bind("resume", function () { var ip = load().inProgress; upgrade(ip); ip.startedAt = null; resumeClock(ip); state.exam = ip; renderExam(); startTimer(); });
-    bind("discard", function () { var dd = load(); dd.inProgress = null; save(dd); renderHome(); });
+    bind("discard", function () { var dd = load(); if (dd.inProgress) forgetCode(dd.inProgress.code); dd.inProgress = null; save(dd); renderHome(); });
+    var codeLoad = function () {
+      var cur = load().inProgress, typed = val("resumeCode").trim().toUpperCase();
+      if (cur && cur.code !== typed && !window.confirm("This replaces the unfinished exam on this device (" + cur.title + "). Continue?")) return;
+      var msg = document.getElementById("codeMsg"); if (msg) msg.textContent = "Loading…";
+      loadByCode(typed, function (err) { var m = document.getElementById("codeMsg"); if (err && m) m.textContent = err; });
+    };
+    bind("loadCode", codeLoad);
+    var rc = document.getElementById("resumeCode");
+    if (rc) rc.addEventListener("keydown", function (e) { e.stopPropagation(); if (e.key === "Enter") codeLoad(); });
     Array.prototype.forEach.call(app.querySelectorAll(".formgrid button"), function (b) {
       b.addEventListener("click", function () { start({ mode: "form", form: parseInt(b.getAttribute("data-form"), 10) }); });
     });
@@ -196,6 +287,7 @@
     state.exam = buildExam({ mode: opts.mode, form: opts.form, domain: opts.domain, count: opts.count, study: study,
       minutes: opts.mode === "drill" ? 0 : BANK.minutes, timed: timed });
     saveProgress(); renderExam(); startTimer();
+    requestCode(state.exam);
   }
 
   function renderExam() {
@@ -203,7 +295,8 @@
     var ex = state.exam, it = ex.items[ex.current], n = ex.items.length;
     var answered = ex.items.filter(function (i) { return i.chosen.length === i.select; }).length;
     var reveal = ex.study && it.checked;
-    var html = '<div class="row" style="margin-bottom:12px"><div><strong>' + esc(ex.title) + '</strong><div class="muted small">' + answered + ' of ' + n + ' answered' + (ex.study ? ' · study mode' : '') + (ex.minutes && !ex.timed ? ' · timer paused, ' + fmtTime(ex.minutes * 60 - elapsed(ex)) + ' left' : '') + '</div></div><div class="spacer"></div>' +
+    var html = '<div class="row" style="margin-bottom:12px"><div><strong>' + esc(ex.title) + '</strong><div class="muted small">' + answered + ' of ' + n + ' answered' + (ex.study ? ' · study mode' : '') + (ex.minutes && !ex.timed ? ' · timer paused, ' + fmtTime(ex.minutes * 60 - elapsed(ex)) + ' left' : '') +
+      (ex.code ? ' · <span title="Type this code on another device to continue this exam">Resume code: <strong class="rcode">' + esc(ex.code) + '</strong></span>' : '') + '</div></div><div class="spacer"></div>' +
       (ex.minutes ? '<label class="check" style="margin:0 8px 0 0"><input type="checkbox" id="limitToggle"' + (ex.timed ? ' checked' : '') + '> Time limit</label>' : '') +
       '<button class="btn" id="toHome">Save &amp; exit</button><button class="btn primary" id="submitBtn">' + (ex.study ? 'Finish' : 'Submit exam') + '</button></div>';
 
@@ -243,7 +336,7 @@
     bind("next", function () { go(ex.current + 1); });
     bind("flag", function () { it.flagged = !it.flagged; saveProgress(); renderExam(); });
     bind("check", function () { it.checked = true; saveProgress(); renderExam(); });
-    bind("toHome", function () { pauseClock(ex); saveProgress(); renderHome(); });
+    bind("toHome", function () { pauseClock(ex); saveProgress(); syncNow(); renderHome(); });
     var lt = document.getElementById("limitToggle");
     if (lt) lt.addEventListener("change", function () { setTimed(ex, lt.checked); });
     bind("submitBtn", function () {
@@ -274,6 +367,8 @@
     var ex = state.exam; if (!ex || ex.submitted) return;
     stopTimer(); timerEl.hidden = true;
     ex.submitted = true; ex.seconds = Math.round(elapsed(ex));
+    if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; }
+    forgetCode(ex.code);
     var correct = ex.items.filter(isCorrect).length;
     var pct = Math.round(100 * correct / ex.items.length);
     addHistory({ title: ex.title, form: ex.mode === "form" ? ex.form : null, date: Date.now(), correct: correct, total: ex.items.length, pct: pct, seconds: ex.seconds });
@@ -334,7 +429,7 @@
     else if (k === "F") { it.flagged = !it.flagged; saveProgress(); renderExam(); }
   });
   document.getElementById("homeLink").addEventListener("click", function () {
-    if (state.view === "exam") { pauseClock(state.exam); saveProgress(); }
+    if (state.view === "exam") { pauseClock(state.exam); saveProgress(); syncNow(); }
     renderHome();
   });
 

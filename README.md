@@ -10,7 +10,8 @@ Unofficial study material, not affiliated with or endorsed by Anthropic. Every q
 - Generates 63-item exams at the official domain weighting, timed at 120 minutes, with single-answer and multiple-response ("choose TWO / THREE") items.
 - **100 fixed practice forms.** A form number always produces the same questions and option order, so it can be retaken. Random forms and per-domain drills are also available.
 - Scores items all-or-nothing, as the real exam does for multiple-response items, and breaks results down by domain. Every option has an explanation.
-- Saves progress and history in the browser (localStorage). There is no backend and no tracking.
+- Saves progress and history in the browser (localStorage). No tracking.
+- **Resume codes:** each practice exam gets a 4-letter code (shown at the top of the exam). Typing it into the home page on another device continues the same exam. A Cloudflare Pages Function stores a compact copy (question IDs, option order, answers, clock) in Workers KV; codes expire 30 days after the last save and are deleted when the exam is submitted.
 
 | Domain | Weight | Items per exam |
 |---|---:|---:|
@@ -25,6 +26,8 @@ Unofficial study material, not affiliated with or endorsed by Anthropic. Every q
 ## Repository layout
 
 ```
+wrangler.toml        # Pages config: output directory + KV binding for resume codes
+functions/api/progress/  # Pages Functions: create, load, update, delete resume codes
 public/              # deployed site (Cloudflare Pages output directory)
   index.html
   app.js             # exam generator, timer, scoring, review
