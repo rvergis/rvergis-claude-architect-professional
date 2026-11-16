@@ -665,7 +665,7 @@
    "id": "D2-014",
    "domain": 2,
    "select": 1,
-   "stem": "A report generator produces about 2,500 output tokens per request from about 8,000 input tokens. Cost analysis shows output dominates spend. Downstream, only an executive summary and a table of six metrics are used. What is the most effective change?",
+   "stem": "Users click 'Generate' and wait on screen for a report. Each report uses about 8,000 input tokens and produces about 2,500 output tokens, and cost analysis shows output dominates spend. Downstream, only the executive summary and a table of six metrics are used. What is the most effective change?",
    "options": [
     "Enable prompt caching on the 8,000 input tokens, which are identical across most requests, cutting the dominant cost by about 90%.",
     "Move report generation to the Batches API, which halves the price of both input and output tokens for the same requests.",
@@ -675,7 +675,7 @@
    "answer": [
     3
    ],
-   "explanation": "Output tokens are priced several times higher than input tokens, so shrinking the output to what is actually consumed is the biggest lever. Caching (A) only discounts input. Batches (B) halve cost but add up to 24 hours of latency, which is wrong for an interactive report. Raising max_tokens (C) does nothing for cost."
+   "explanation": "Output tokens are priced several times higher than input tokens, and most of this output is thrown away, so generating only what is used is the biggest lever (D). Caching (A) only discounts input, which is the smaller cost. Batches (B) halve the price but can take up to 24 hours to return results, and users are waiting on screen. Raising max_tokens (C) does nothing to lower cost."
   },
   {
    "id": "D2-015",
