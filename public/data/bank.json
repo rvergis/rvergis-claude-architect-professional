@@ -1,6 +1,6 @@
 {
  "version": "1.0.0",
- "generated": "2026-11-11",
+ "generated": "2026-11-15",
  "exam": "CCAR-P",
  "items_per_exam": 63,
  "minutes": 120,
@@ -2371,6 +2371,446 @@
     2
    ],
    "explanation": "Operational support benefits from fast, broad read access, while changes during incidents carry high risk. Read-only scoped access with human-controlled remediation and an audit trail gives speed without new failure modes. Admin credentials (A) and disabled prompts (D) remove safety under pressure. Database dumps (B) expose sensitive data unnecessarily."
+  },
+  {
+   "id": "D1-025",
+   "domain": 1,
+   "select": 1,
+   "stem": "A production outage has three competing theories: a bad deploy, a database lock, and an expired certificate. You want three Claude Code workers to investigate in parallel and to challenge each other's findings as they go, not just report back separately at the end. Which setup fits?",
+   "options": [
+    "Subagents, one per theory, each reporting its conclusion back to the main session when it finishes.",
+    "An agent team, where the teammates share a task list and message each other directly as they work.",
+    "A single session that works through the three theories one after another and compares them.",
+    "A dynamic workflow that runs one agent per log file and merges all the findings in a script."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Agent teams let teammates message each other directly and challenge each other's conclusions while they work, which is exactly what competing-hypothesis debugging needs (B). Subagents only report back to the main session, so they can't debate each other (A). A single session loses the parallelism (C). A dynamic workflow runs isolated agents under a fixed script, and those agents don't talk to each other (D)."
+  },
+  {
+   "id": "D1-026",
+   "domain": 1,
+   "select": 1,
+   "stem": "A team must check 600 API route files for a missing authorization check, then double-check every finding before it goes into a report. The same check applies to every file. Which approach fits best?",
+   "options": [
+    "An agent team of five teammates who split up the files and talk through their results with each other.",
+    "A single session that reads all 600 files into one long context and lists the problems it finds.",
+    "A dynamic workflow that runs one agent per file, then a separate verification pass on each finding.",
+    "One subagent that reviews all 600 files on its own and returns a short summary of the problems."
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "This is the same check repeated many times in parallel, with verification built in, which is what dynamic workflows are for: a script fans out one agent per file and then verifies each finding (C). An agent team suits a few workers who need to debate, not hundreds of identical checks, and costs more (A). One long context or one subagent would overload a single context window and miss files (B, D)."
+  },
+  {
+   "id": "D1-027",
+   "domain": 1,
+   "select": 2,
+   "stem": "An orchestrator sends 100 documents to subagents. Each subagent returns a verdict, a synthesis step adds up the verdicts it received, and then every flagged document is archived automatically. Some subagents occasionally time out and return nothing. Which TWO changes fix the most serious defects?",
+   "options": [
+    "Have the synthesis step compare the verdicts it received against the 100 inputs and report any that are missing.",
+    "Require human approval, or use a reversible soft-archive, before any document is actually archived.",
+    "Switch the synthesis step to a larger model so it summarizes the returned verdicts more accurately.",
+    "Double the number of subagents so each one handles fewer documents and finishes sooner.",
+    "Remove the shared trace ID from the subagent calls to cut down on logging overhead."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Today a timed-out subagent silently disappears, and the report still looks complete. Comparing results against the input list makes the gaps visible (A). Archiving is irreversible and happens automatically on possibly incomplete data, so it needs a human gate or a reversible version (B). A bigger model doesn't notice missing inputs (C), more subagents don't fix silent failures (D), and the trace ID is good practice that helps debugging (E)."
+  },
+  {
+   "id": "D1-028",
+   "domain": 1,
+   "select": 1,
+   "stem": "A consulting firm wants an assistant that answers questions about its own proprietary methodologies. These methodologies were never published, so they are not in the model's training data. Which AI property is the main constraint, and what is the standard mitigation?",
+   "options": [
+    "Steerability: write a longer system prompt that describes each methodology in general terms.",
+    "Knowledge: retrieve the relevant methodology documents into the context at the time of each question.",
+    "Working memory: switch to a model with a larger context window so it remembers more of the firm's work.",
+    "Next token prediction: lower the temperature so the model guesses less when it answers questions."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The model can't know content it was never trained on, which is a knowledge limit. The fix is to supply that content at question time through retrieval (B). A general description in the prompt is too thin and can't cover detailed questions (A). A bigger context window doesn't create knowledge the model never had (C). Lowering temperature doesn't add missing facts (D)."
+  },
+  {
+   "id": "D1-029",
+   "domain": 1,
+   "select": 1,
+   "stem": "A knowledge assistant will draw on 12,000 reports, each 5 to 80 pages long. The longest report is about 30,000 tokens. Which statement best describes the working-memory constraint?",
+   "options": [
+    "Individual reports are too long for the context window, so each one must be summarized before use.",
+    "There is no real constraint, because current context windows can hold the entire collection at once.",
+    "Any single report fits easily, but the whole collection far exceeds any context window, so retrieval is needed.",
+    "The constraint is output length, because answers about long reports will exceed the model's maximum output tokens."
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "A 30,000-token report fits comfortably in a modern context window, so single documents are not the problem (A). The collection as a whole runs to hundreds of millions of tokens, far beyond any context window (B is wrong), and that corpus scale is what makes retrieval necessary (C). Output length is unrelated to how much material the system draws on (D)."
+  },
+  {
+   "id": "D1-030",
+   "domain": 1,
+   "select": 1,
+   "stem": "When retrieval fails to find the right document, an internal assistant still gives a confident, detailed answer that includes project names that sound real but don't exist. Which two AI properties are interacting, and what is the most direct fix?",
+   "options": [
+    "Working memory and steerability: repeat the instructions at the end of every long conversation.",
+    "Next token prediction and knowledge: require answers to cite retrieved sources and allow 'not found.'",
+    "Steerability and knowledge: fine-tune the model on the firm's project names every quarter.",
+    "Next token prediction and working memory: use a larger context window so more documents fit."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The model writes what sounds plausible (next token prediction) about facts it doesn't have (knowledge), which produces confident invented details. Requiring citations to retrieved sources, and explicitly allowing 'not found,' removes the pressure to fill the gap (B). Repeating instructions targets drift in long conversations, a different problem (A). Fine-tuning doesn't stop invention when retrieval misses (C), and a bigger window doesn't help when the right document was never retrieved (D)."
+  },
+  {
+   "id": "D2-019",
+   "domain": 2,
+   "select": 1,
+   "stem": "A pipeline's system prompt says: 'Return only valid JSON with the fields reply, citations and needs_review.' About 1 in 200 responses still breaks the downstream parser. What is the most reliable fix?",
+   "options": [
+    "Repeat the JSON instruction at both the start and the end of the system prompt.",
+    "Pass the JSON schema in the request's structured-output setting so the API enforces it.",
+    "Add three examples of valid JSON and automatically retry any response that fails to parse.",
+    "Set the temperature to 0 so the model produces the same valid format on every request."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A schema passed as a structured-output request parameter is enforced during generation, so the response always matches the shape (B). Repeating the instruction (A) or adding examples (C) still relies on the model following an instruction, and retries add cost and delay. Temperature 0 doesn't guarantee valid JSON (D)."
+  },
+  {
+   "id": "D2-020",
+   "domain": 2,
+   "select": 1,
+   "stem": "A support-reply drafter returns structured output that includes a field commitments_used, listing the IDs of any refunds or timelines the reply promises. Structured outputs guarantee the response has this shape. What else is needed to enforce the rule 'never promise a refund the agent has not approved'?",
+   "options": [
+    "Nothing more: once the schema is enforced, the model cannot write an unapproved promise anywhere.",
+    "Code that checks each listed ID against that ticket's approved actions and scans the reply text for promises.",
+    "A longer system prompt that explains why unapproved refunds are costly and risky for the business.",
+    "An enum in the schema that lists every refund ID the company has ever approved for any customer."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The schema guarantees the shape, not the values: the model could list an unapproved ID or write a promise into the free-text reply. Code must check the IDs against that ticket's approved list and scan the reply text (B), which is why (A) is wrong. A longer prompt is still only an instruction (C). A global enum would allow IDs approved for other tickets, and a per-ticket enum would change the schema on every request (D)."
+  },
+  {
+   "id": "D2-021",
+   "domain": 2,
+   "select": 1,
+   "stem": "A platform team wants every application in the company to follow the same 'support-reply' procedure (instructions plus a helper script) through the Claude API. They need one version for everyone and the ability to roll back a bad update quickly. Which approach fits?",
+   "options": [
+    "Paste the procedure into each application's system prompt and email the teams whenever it changes.",
+    "Upload it as a custom Skill, and attach it to each request through container.skills with a pinned version.",
+    "Put the procedure into an MCP server's tool description so that every connected client can read it.",
+    "Store the procedure in a CLAUDE.md file in each application's repository and update every copy of it by hand."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A custom Skill uploaded once gets an ID and versions, and each request attaches it with a pinned version, so rolling back means changing one version string (B). Copying it into prompts or repo files creates drift, with no central rollback (A, D). A tool description is meant to describe a tool, not to deliver a procedure with scripts (C)."
+  },
+  {
+   "id": "D2-022",
+   "domain": 2,
+   "select": 2,
+   "stem": "An architect proposes packaging a latency-sensitive ticket classifier's instructions as an API Skill. Which TWO facts matter most for that decision?",
+   "options": [
+    "Skills need the code execution tool, so each request carries the sandbox's startup time and its extra cost.",
+    "The code execution sandbox has no internet access, so a Skill's scripts can't call outside APIs on their own.",
+    "Every attached Skill's full instructions load into the context on every request, whether they are used or not.",
+    "Skills can't be versioned through the API, so any rollback has to be handled in the application's own code.",
+    "Skills only run inside Claude Code and the Claude apps, so they can't be used through the Messages API."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "API Skills run in the code execution sandbox, which adds latency and cost to every request, a real concern for a latency-sensitive classifier (A). The sandbox has no internet access, which limits what a Skill's scripts can do (B). Only each Skill's name and description load up front, and the full instructions load when relevant (C is wrong). Skills support versions (D is wrong) and work through the Messages API with the container parameter (E is wrong)."
+  },
+  {
+   "id": "D3-028",
+   "domain": 3,
+   "select": 1,
+   "stem": "A RAG system splits every document into fixed 500-token chunks. Questions about pricing tables keep failing, because table rows end up in different chunks from their column headers. What is the best fix?",
+   "options": [
+    "Shrink chunks to 100 tokens so that each table row becomes its own chunk.",
+    "Chunk along document structure, keeping each table whole with its headers and title.",
+    "Raise top-k from 5 to 30 so that more fragments of each table are retrieved and sent together.",
+    "Turn the tables into images and rely on the model's vision to read them back."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Fixed-size chunking cuts through tables, separating rows from the headers that give them meaning. Structure-aware chunking keeps each table intact with its headers and section title (B). Smaller chunks make the separation worse (A). A larger top-k adds noise and cost and still might not bring back the matching header chunk (C). Converting to images adds cost and doesn't fix how the content is split up (D)."
+  },
+  {
+   "id": "D3-029",
+   "domain": 3,
+   "select": 2,
+   "stem": "A team is choosing the chunk size for a RAG index of policy documents. Which TWO statements are accurate?",
+   "options": [
+    "Small chunks match queries precisely, but they can strip out the context needed to answer correctly.",
+    "Large chunks keep more context, but they dilute relevance and add tokens to every request that retrieves them.",
+    "Chunk size only affects indexing time and has no effect on answer quality or on per-request cost.",
+    "With overlap between neighboring chunks, the chunk size no longer needs to be tested on an eval set.",
+    "Bigger chunks are always better, now that context windows hold hundreds of thousands of tokens."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Chunk size is a trade-off. Small chunks are precise but can lose surrounding context (A). Large chunks keep context but blur relevance and raise per-request cost, since every retrieved chunk is sent to the model (B). Size affects quality and cost, not only indexing (C is wrong). Overlap helps but doesn't replace measuring retrieval on an eval set (D is wrong). A large context window doesn't make diluted chunks retrieve better (E is wrong)."
+  },
+  {
+   "id": "D3-030",
+   "domain": 3,
+   "select": 1,
+   "stem": "Short, precise chunks retrieve the right passages, but the answers miss details from the surrounding section. Long chunks give enough context but retrieve poorly. Which pattern gets the benefits of both?",
+   "options": [
+    "Index small chunks for matching, then send each match's larger parent section to the model.",
+    "Index only long chunks, and add a reranker so the right long chunk moves to the top.",
+    "Index small chunks and raise top-k to 50 so the missing details arrive in other chunks.",
+    "Summarize every document into one paragraph and index only those summaries."
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "The small-to-big (parent-child) pattern matches on small, precise chunks and then hands the model the larger section around each match, giving both precision and context (A). A reranker can't fix long chunks that retrieve poorly in the first place (B). A huge top-k floods the context with unrelated text (C). Summaries lose the details users ask about (D)."
+  },
+  {
+   "id": "D3-031",
+   "domain": 3,
+   "select": 1,
+   "stem": "A support assistant must show its first words within 1.5 seconds. Turning on extended thinking raises answer accuracy from 86% to 90%, but pushes time to first token to 4 seconds. Hard questions are about 15% of traffic and cause most of the errors. What is the best design?",
+   "options": [
+    "Turn on extended thinking for all traffic, since accuracy matters more than speed in customer support.",
+    "Drop extended thinking entirely and accept 86%, since the 1.5-second target is a hard limit.",
+    "Use a fast classifier to send only hard questions to extended thinking, and keep the rest fast.",
+    "Keep extended thinking for all traffic, but show a progress spinner to hide the extra delay."
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "Most errors come from a small slice of hard questions, so routing only those to extended thinking captures most of the accuracy gain while most traffic stays fast (C). Turning it on for everything breaks the latency requirement for 85% of users who don't need it (A, D). Dropping it entirely gives up a gain that can be had at little cost (B)."
+  },
+  {
+   "id": "D4-023",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team wants to test whether a new retrieval setup raises RFP draft success from 70% to 75%. They plan to run 200 drafts on each version because 'that's plenty of data.' What is the problem?",
+   "options": [
+    "About 200 per version can't reliably separate 70% from 75%; at 95% confidence and 80% power you need roughly 1,250 per version.",
+    "Nothing is wrong: a 5-point lift is a large effect, and large effects show up clearly even in small samples like this one.",
+    "The sample size is fine, but the test must run for at least 30 calendar days to cover monthly patterns, whatever the volume.",
+    "The split should be unequal, with 180 drafts on the old setup and 20 on the new one, to limit the risk from the change."
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "A 5-point lift on a 70% baseline is a small effect. With n ≈ 16 × p(1 − p) ÷ δ², roughly 16 × 0.2 ÷ 0.0025, you need about 1,250 per version (A). At 200 per version, random noise is larger than the effect, so the result would be unreliable (B is wrong). Duration should follow from the required sample and traffic, not a fixed calendar rule (C). An unbalanced split makes the small arm even less informative (D)."
+  },
+  {
+   "id": "D4-024",
+   "domain": 4,
+   "select": 1,
+   "stem": "While planning an A/B test, a team sets 95% confidence and 80% power. A product manager asks what each setting protects against. Which answer is correct?",
+   "options": [
+    "95% confidence caps the chance of shipping a change that only looked better by luck at 5%; 80% power means a real gain is detected 80% of the time.",
+    "95% confidence means a real gain is detected 95% of the time; 80% power caps the chance of being fooled by luck at 20%.",
+    "95% confidence means 95% of drafts will pass the rubric; 80% power means the model is working at 80% of its capability.",
+    "Both describe the same risk: confidence is measured before launch, and power is the same number measured after launch."
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Confidence (significance) limits false positives, which means acting on a difference that was only luck. Power limits false negatives, which means missing a real improvement (A). (B) swaps the two. (C) confuses statistical settings with pass rates and model capability. (D) is wrong because the two settings guard against different errors, and both are chosen before the test."
+  },
+  {
+   "id": "D4-025",
+   "domain": 4,
+   "select": 1,
+   "stem": "An assistant handles 800 requests a day, but only about 10% of them are RFP drafts. An A/B test on RFP drafts needs about 2,500 drafts in total. Roughly how long must the test run?",
+   "options": [
+    "About 3 days, because 800 requests a day easily covers the 2,500 drafts needed",
+    "About 31 days, because only about 80 eligible drafts arrive each day",
+    "About 7 days, because one full week is always enough for any test",
+    "About 300 days, because each draft must be reviewed by a person"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Only eligible requests count toward the sample: 10% of 800 is 80 RFP drafts a day, and 2,500 ÷ 80 ≈ 31 days (B). Counting all 800 requests overstates the sample (A). A week is a minimum for covering weekday patterns, not a substitute for the required sample (C). Grading method doesn't change the arithmetic (D)."
+  },
+  {
+   "id": "D4-026",
+   "domain": 4,
+   "select": 2,
+   "stem": "An A/B test compares two retrieval setups. The document collection mixes 5-page memos and 80-page reports across six practice areas, and users have different document permissions. Which TWO steps best keep the two groups comparable?",
+   "options": [
+    "Randomize assignment within each practice area and permission profile, so both versions get the same mix.",
+    "Run both versions during the same weeks, instead of the old setup one month and the new setup the next.",
+    "Send questions about long 80-page reports to the new setup, since it was built to handle them better.",
+    "Let consultants opt in to the new setup, so the most interested users give the most useful feedback.",
+    "Leave out users with restricted permissions, since their limited access makes the results noisier."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Stratified randomization guarantees the same mix of practice areas and permission levels in both groups (A). Running both versions at the same time stops changes over time, such as new questions or new documents, from being mistaken for a treatment effect (B). Routing hard questions to one version (C) or letting users choose (D) creates biased groups. Dropping restricted users means the test no longer represents real usage (E)."
+  },
+  {
+   "id": "D4-027",
+   "domain": 4,
+   "select": 1,
+   "stem": "Three days into a test planned for four weeks, the new prompt leads 78% to 70%, and the dashboard shows p < 0.05. The sponsor wants to stop the test and ship. What is the best response?",
+   "options": [
+    "Ship now, because a p-value under 0.05 means there is less than a 5% chance the result is wrong.",
+    "Keep running to the planned sample, because stopping at the first good result inflates false positives.",
+    "Stop the test and restart it with a new success metric that better fits what the early data shows.",
+    "Ship to half the users now and keep the other half on the old prompt permanently, as an ongoing control group."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Checking repeatedly and stopping at the first significant result raises the real false-positive rate well above 5%, and early leads often shrink as more data arrives (B). (A) misreads the p-value and ignores the effect of peeking. Changing the metric after seeing data invites false conclusions (C). An indefinite split delays the decision and doesn't answer the question (D)."
+  },
+  {
+   "id": "D4-028",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team tests moving a simple formatting task from Sonnet to Haiku. Cost per request is expected to fall about 70%, and output quality is expected to stay the same. How should they classify the expected effect when planning the test?",
+   "options": [
+    "Small effect, because the quality of the formatted output is expected to stay about the same.",
+    "Large effect on cost, the primary metric, with quality as a guardrail that must not drop.",
+    "No measurable effect, because cost is an accounting figure rather than a model behavior.",
+    "Unknown effect, because Sonnet and Haiku can't be compared fairly on the same task."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Effect size is judged on the primary metric, meaning what the change is meant to move. Here that's cost, and a 70% drop is a large effect (B). Quality is the guardrail you check for no drop, not the effect being tested, so (A) uses the wrong metric. Cost is directly measurable from usage logs (C), and the two models can be compared on the same eval set (D)."
+  },
+  {
+   "id": "D4-029",
+   "domain": 4,
+   "select": 1,
+   "stem": "Two changes have the same small expected effect. Change 1 rewords a greeting in a low-stakes FAQ bot. Change 2 restructures the prompt of a medical intake summarizer, where a missed allergy could delay treatment. Why does change 2 need far more evidence before shipping?",
+   "options": [
+    "Restructuring a prompt always produces a larger effect than rewording a single message does.",
+    "A wrong call there could harm patients and can't be undone, which raises the confidence required.",
+    "Medical text is longer, so each sample carries less information and more samples are needed.",
+    "Regulators require exactly 99% confidence for every healthcare change, whatever the stakes or the effect size."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The confidence requirement is set by the consequence of a wrong call and how reversible it is, independent of effect size. Delayed treatment is serious and can't be undone, so it needs high confidence and a larger sample (B). The effect sizes are the same by premise (A). Text length doesn't set the confidence requirement (C). There is no fixed 99% regulatory rule (D)."
+  },
+  {
+   "id": "D4-030",
+   "domain": 4,
+   "select": 1,
+   "stem": "A cost model multiplies 24,000 monthly requests by an average of 5,200 input tokens and lands at 40% of the budget. Retrieved context per request actually ranges from about 1,000 tokens (short memos) to 40,000 tokens (long reports). What should you do before declaring the system within budget?",
+   "options": [
+    "Nothing: with 24,000 requests, the average is reliable and the expensive requests cancel out.",
+    "Model cost from the real spread of context sizes, including the expensive tail, and test a worst-case mix.",
+    "Double the estimate as a safety margin, since cost estimates are usually off by about half.",
+    "Move the whole workload to the cheapest model so that the expensive requests no longer matter."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A flat average assumes requests cluster near the mean. With context sizes from 1,000 to 40,000 tokens, a tail of large requests can push real cost far above the estimate, so model the actual distribution and test a worst-case mix (B). Large requests don't cancel out (A). An arbitrary multiplier isn't analysis (C). Switching models changes quality and doesn't answer whether this design fits the budget (D)."
+  },
+  {
+   "id": "D7-011",
+   "domain": 7,
+   "select": 1,
+   "stem": "A CI job runs Claude Code unattended. It must be allowed to run only a fixed list of approved commands, and anything else must be refused automatically instead of hanging while it waits for approval. Which permission mode fits?",
+   "options": [
+    "default mode, so Claude stops and asks for approval whenever it needs to run a new command.",
+    "acceptEdits mode, so file edits are approved and other commands still prompt.",
+    "dontAsk mode with allow rules, so anything not pre-approved is denied automatically.",
+    "bypassPermissions mode, so no command ever stops to wait for an approval."
+   ],
+   "answer": [
+    2
+   ],
+   "explanation": "dontAsk denies anything that would need a prompt and runs only what your allow rules cover, which is ideal for locked-down CI (C). default and acceptEdits still prompt, and with no one there to answer, the job hangs (A, B). bypassPermissions removes all checks, the opposite of 'only approved commands' (D)."
+  },
+  {
+   "id": "D7-012",
+   "domain": 7,
+   "select": 1,
+   "stem": "A developer asks when it is acceptable to run Claude Code in bypassPermissions mode, which skips all permission checks. What is the correct guidance?",
+   "options": [
+    "On developer laptops, for experienced engineers who carefully review every diff afterward.",
+    "Inside an isolated, disposable container that has no access to production systems or secrets.",
+    "In CI for any repository, as long as the pipeline only runs on a protected branch.",
+    "Whenever auto mode isn't available on the team's plan, as a substitute for it."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "With every check turned off, the only safe place is an isolated, throwaway environment where nothing important can be damaged or leaked (B). Reviewing diffs afterward doesn't prevent destructive commands or leaks at run time (A). Branch protection doesn't sandbox what commands can do (C). Auto mode still screens actions, while bypassPermissions screens nothing, so one doesn't replace the other (D)."
+  },
+  {
+   "id": "D7-013",
+   "domain": 7,
+   "select": 1,
+   "stem": "A team defines a reviewer subagent with permissionMode set to plan, intending it to be read-only. The main Claude Code session is running in bypassPermissions mode. What happens when the reviewer runs?",
+   "options": [
+    "The reviewer stays read-only, because a subagent's own permissionMode always takes priority.",
+    "The reviewer inherits bypassPermissions; to keep it read-only, restrict it with a tools allowlist.",
+    "The reviewer fails to start, because its permission mode conflicts with the main session's current mode.",
+    "The main session switches to plan mode for as long as the reviewer subagent is running."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "When the main session runs in bypassPermissions, acceptEdits or auto mode, subagents run in that same mode and their own permissionMode is ignored (B, so A is wrong). To make a subagent truly read-only, limit which tools it has at all, for example tools: Read, Grep, Glob. There is no conflict error (C), and the main session's mode doesn't change (D)."
+  },
+  {
+   "id": "D7-014",
+   "domain": 7,
+   "select": 1,
+   "stem": "A reviewer subagent is defined with disallowedTools: Write, Edit. During a run, it still modified a configuration file. What is the most likely explanation?",
+   "options": [
+    "It still had the Bash tool and changed the file with a shell command such as sed -i.",
+    "disallowedTools only applies to the main session and is ignored by subagents.",
+    "Subagents ignore their definition file whenever they are started in the background by the main session.",
+    "The Edit tool is turned back on automatically after the first denied attempt."
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "Blocking Write and Edit doesn't block file changes made through the shell. With Bash available, commands like sed -i or echo > file still modify files (A). For a truly read-only reviewer, also remove Bash or restrict it with deny rules. disallowedTools does apply to subagents (B), definitions are respected in the background (C), and denied tools don't switch themselves back on (D)."
+  },
+  {
+   "id": "D7-015",
+   "domain": 7,
+   "select": 1,
+   "stem": "An engineer running a Claude Code agent team asks one teammate to create its own sub-team of three teammates for a smaller part of the problem. What happens?",
+   "options": [
+    "It works: teammates can create their own teammates, up to three levels below the lead.",
+    "It isn't allowed: only the lead creates teammates, though a teammate can still use subagents.",
+    "It works, but the new teammates replace the original lead as coordinators of the team.",
+    "It isn't allowed, because an agent team can never have more than three teammates in total at once."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Agent teams can't be nested: only the lead creates and shuts down teammates, and there is one team per session (B). A teammate that needs help with a sub-problem can delegate to subagents instead. The three-levels rule applies to subagents spawning subagents, not to teams (A). Leadership can't change hands (C), and there is no hard limit of three teammates, although 3 to 5 is the recommended size (D)."
   }
  ]
 }
