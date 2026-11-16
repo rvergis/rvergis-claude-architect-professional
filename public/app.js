@@ -89,7 +89,15 @@
   }
 
   /* ---------- timer ---------- */
-  function elapsed(ex) { return ex.elapsedBefore + (Date.now() - ex.startedAt) / 1000; }
+  function elapsed(ex) { return ex.elapsedBefore + (ex.startedAt ? (Date.now() - ex.startedAt) / 1000 : 0); }
+  function pauseClock(ex) { if (ex && ex.startedAt) { ex.elapsedBefore = elapsed(ex); ex.startedAt = null; } }
+  function resumeClock(ex) { if (ex && !ex.startedAt) ex.startedAt = Date.now(); }
+  /* Pause the clock while the tab is hidden, so an exam left open overnight doesn't expire. */
+  document.addEventListener("visibilitychange", function () {
+    var ex = state.exam;
+    if (state.view !== "exam" || !ex || ex.submitted) return;
+    if (document.hidden) { pauseClock(ex); saveProgress(); } else { resumeClock(ex); }
+  });
   function startTimer() {
     stopTimer();
     var ex = state.exam;
@@ -109,6 +117,7 @@
   function renderHome() {
     stopTimer(); timerEl.hidden = true; state.view = "home";
     var d = load(), hist = d.history || [], done = {};
+    var prefs = d.prefs || { timed: true, study: false };
     hist.forEach(function (h) { if (h.form) done[h.form] = true; });
     var counts = {}; BANK.questions.forEach(function (q) { counts[q.domain] = (counts[q.domain] || 0) + 1; });
     var multi = BANK.questions.filter(function (q) { return q.select > 1; }).length;
@@ -123,12 +132,12 @@
     }
 
     html += '<div class="grid2"><div class="card"><h3>Start an exam</h3>' +
+      '<label class="check"><input type="checkbox" id="timed"' + (prefs.timed ? ' checked' : '') + '> Time limit: 120 minutes <span class="muted small">(uncheck for no time limit)</span></label>' +
+      '<label class="check"><input type="checkbox" id="study"' + (prefs.study ? ' checked' : '') + '> Study mode <span class="muted small">(show the answer after each question)</span></label>' +
       '<label class="field" for="formNo">Practice form (1–' + FORMS + ')</label>' +
       '<div class="row"><input type="number" id="formNo" min="1" max="' + FORMS + '" value="' + nextForm(done) + '"><button class="btn primary" id="startForm">Start form</button></div>' +
       '<div class="row" style="margin-top:10px"><button class="btn" id="startRandom">Random form</button></div>' +
-      '<label class="check"><input type="checkbox" id="timed" checked> Timed (120 minutes)</label>' +
-      '<label class="check"><input type="checkbox" id="study"> Study mode (show answers after each question)</label>' +
-      '</div>' +
+      '<p class="muted small" style="margin-top:10px">These settings also apply to the numbered forms below.</p></div>' +
       '<div class="card"><h3>Domain drill</h3>' +
       '<label class="field" for="drillDomain">Domain</label><select id="drillDomain">' +
       BANK.domains.map(function (dm) { return '<option value="' + dm.id + '">' + dm.id + '. ' + esc(dm.name) + ' (' + (counts[dm.id] || 0) + ')</option>'; }).join("") +
@@ -153,10 +162,14 @@
     html += '<div class="note">Scoring: an item counts as correct only when you select exactly the right option(s). The real exam reports a scaled score (passing is 720 on a 100–1,000 scale); the percentages here are raw and are not converted to that scale.</div>';
     app.innerHTML = html;
 
+    ["timed", "study"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("change", function () { var dd = load(); dd.prefs = dd.prefs || { timed: true, study: false }; dd.prefs[id] = el.checked; save(dd); });
+    });
     bind("startForm", function () { var n = parseInt(val("formNo"), 10); if (n >= 1 && n <= FORMS) start({ mode: "form", form: n }); });
     bind("startRandom", function () { start({ mode: "random" }); });
     bind("startDrill", function () { start({ mode: "drill", domain: parseInt(val("drillDomain"), 10), count: Math.max(1, parseInt(val("drillCount"), 10) || 10), study: true, untimed: true }); });
-    bind("resume", function () { var ip = load().inProgress; ip.startedAt = Date.now(); state.exam = ip; renderExam(); startTimer(); });
+    bind("resume", function () { var ip = load().inProgress; ip.startedAt = null; resumeClock(ip); state.exam = ip; renderExam(); startTimer(); });
     bind("discard", function () { var dd = load(); dd.inProgress = null; save(dd); renderHome(); });
     Array.prototype.forEach.call(app.querySelectorAll(".formgrid button"), function (b) {
       b.addEventListener("click", function () { start({ mode: "form", form: parseInt(b.getAttribute("data-form"), 10) }); });
@@ -178,7 +191,8 @@
     var ex = state.exam, it = ex.items[ex.current], n = ex.items.length;
     var answered = ex.items.filter(function (i) { return i.chosen.length === i.select; }).length;
     var reveal = ex.study && it.checked;
-    var html = '<div class="row" style="margin-bottom:12px"><div><strong>' + esc(ex.title) + '</strong><div class="muted small">' + answered + ' of ' + n + ' answered' + (ex.study ? ' · study mode' : '') + '</div></div><div class="spacer"></div>' +
+    var html = '<div class="row" style="margin-bottom:12px"><div><strong>' + esc(ex.title) + '</strong><div class="muted small">' + answered + ' of ' + n + ' answered' + (ex.study ? ' · study mode' : '') + (ex.minutes ? '' : ' · no time limit') + '</div></div><div class="spacer"></div>' +
+      (ex.minutes ? '<button class="btn" id="noLimit">Remove time limit</button>' : '') +
       '<button class="btn" id="toHome">Save &amp; exit</button><button class="btn primary" id="submitBtn">' + (ex.study ? 'Finish' : 'Submit exam') + '</button></div>';
 
     html += '<div class="card"><div class="qhead"><span><strong>Question ' + (ex.current + 1) + '</strong> <span class="muted">of ' + n + '</span></span>' +
@@ -217,7 +231,11 @@
     bind("next", function () { go(ex.current + 1); });
     bind("flag", function () { it.flagged = !it.flagged; saveProgress(); renderExam(); });
     bind("check", function () { it.checked = true; saveProgress(); renderExam(); });
-    bind("toHome", function () { ex.elapsedBefore = elapsed(ex); ex.startedAt = Date.now(); saveProgress(); renderHome(); });
+    bind("toHome", function () { pauseClock(ex); saveProgress(); renderHome(); });
+    bind("noLimit", function () {
+      if (!window.confirm("Remove the time limit for this exam? The timer can't be turned back on.")) return;
+      ex.minutes = 0; stopTimer(); timerEl.hidden = true; saveProgress(); renderExam();
+    });
     bind("submitBtn", function () {
       var left = ex.items.filter(function (i) { return i.chosen.length !== i.select; }).length;
       if (left && !ex.study && !window.confirm(left + " question(s) are unanswered or incomplete. Submit anyway?")) return;
@@ -306,7 +324,7 @@
     else if (k === "F") { it.flagged = !it.flagged; saveProgress(); renderExam(); }
   });
   document.getElementById("homeLink").addEventListener("click", function () {
-    if (state.view === "exam") { state.exam.elapsedBefore = elapsed(state.exam); state.exam.startedAt = Date.now(); saveProgress(); }
+    if (state.view === "exam") { pauseClock(state.exam); saveProgress(); }
     renderHome();
   });
 
