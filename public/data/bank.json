@@ -1,6 +1,6 @@
 {
  "version": "1.0.0",
- "generated": "2026-11-16",
+ "generated": "2026-11-17",
  "exam": "CCAR-P",
  "items_per_exam": 63,
  "minutes": 120,
@@ -3431,6 +3431,1760 @@
     1
    ],
    "explanation": "When streaming, tool inputs arrive as partial JSON fragments. Collect them and parse once the content block ends, or use a parser built for partial JSON if you need to preview (B). Streaming does support tool use (A). The final input is ordinary JSON, not a different format (C). Thinking blocks are separate from tool input (D)."
+  },
+  {
+   "id": "D1-035",
+   "domain": 1,
+   "select": 1,
+   "stem": "A marketing team uses a generator-reviewer loop: one prompt writes ad copy, another checks it against 8 brand rules and sends feedback. Sometimes the loop runs 30 rounds and never finishes. What design fix matters most?",
+   "options": [
+    "Remove the reviewer, since a single well-written prompt should get the copy right the first time.",
+    "Stop when all 8 rules pass or after a set number of rounds, then send the best draft to a person.",
+    "Let the reviewer rewrite the copy itself instead of sending feedback, so fewer rounds are needed.",
+    "Switch the reviewer to a stricter model, so that its feedback is clearer and the loop ends sooner."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "An evaluator-optimizer loop needs a clear finish line (all rules pass) and a hard limit on rounds, with a person handling what's still failing (B). Removing the reviewer loses the quality check (A). If the reviewer rewrites the copy, no one checks the rewrite (C). A stricter reviewer can make the loop run even longer (D)."
+  },
+  {
+   "id": "D1-036",
+   "domain": 1,
+   "select": 1,
+   "stem": "A support system handles 50,000 questions a day. About 85% are simple lookups, and 15% need careful multi-step reasoning. Using the most capable model for everything is over budget. What design fits?",
+   "options": [
+    "Use the cheapest model for everything, and accept lower quality on the hard questions.",
+    "Route each question with a fast classifier: simple ones to a small model, hard ones to a larger model.",
+    "Ask users to tick a box saying whether their question is simple or complex before they submit it to the assistant.",
+    "Send every question to both models and show users whichever answer comes back first."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Routing sends each request to the cheapest model that can handle it well, which cuts cost while keeping quality on the hard 15% (B). Accept the routing errors you measure on an eval set, and escalate when the small model's answer fails a check. Using the cheapest model for everything hurts the hard cases (A). Users can't judge complexity reliably (C). Calling both models doubles the cost (D)."
+  },
+  {
+   "id": "D1-037",
+   "domain": 1,
+   "select": 1,
+   "stem": "A chat assistant must check every user message for policy violations before answering. Running the check first and then answering adds 600 ms. How can you keep the check without the extra wait?",
+   "options": [
+    "Skip the check for returning users, since they have already passed it in earlier conversations.",
+    "Run the check and the answer at the same time, and block the answer if the check fails.",
+    "Run the check only on every tenth message, which cuts the average delay by 90%.",
+    "Move the check to a nightly batch job that reviews all of the day's conversations."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Parallelization lets the guardrail and the answer run together. If the check fails, the answer is withheld, so safety is kept without adding the check's time on top (B). Returning users can still send harmful messages (A). Sampling lets 9 out of 10 messages through unchecked (C). A nightly review finds problems after users have already seen the answers (D)."
+  },
+  {
+   "id": "D1-038",
+   "domain": 1,
+   "select": 1,
+   "stem": "A team is building a custom agent that reads files, runs shell commands, searches the web and manages long sessions. They are about to write their own loop, tool runner and context management on top of the raw Messages API. What should they consider first?",
+   "options": [
+    "Writing the loop from scratch, since only fully custom code can give an agent complete control over its tools.",
+    "The Claude Agent SDK, which provides the agent loop, built-in tools, permissions and context management.",
+    "Using Claude.ai Projects, since projects can run shell commands on the team's own servers.",
+    "A single very long prompt that tells the model to imagine the results of each tool call."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Agent SDK packages the same building blocks that power Claude Code: the tool loop, file and shell tools, permission controls and context management. That saves rebuilding them (B). Custom code is possible but repeats solved problems (A). Projects don't run commands on your servers (C). Imagined tool results aren't real results (D)."
+  },
+  {
+   "id": "D1-039",
+   "domain": 1,
+   "select": 1,
+   "stem": "A developer is surprised that their chatbot 'forgets' what the user said two messages ago. Each request sends only the newest user message to the Messages API. What is the cause?",
+   "options": [
+    "The model's context window is too small to hold more than one message at a time.",
+    "The API doesn't remember past requests, so the app must send the conversation history each time.",
+    "The conversation memory setting is turned off by default and must be switched on in the API console.",
+    "The model forgets earlier messages after about a minute unless prompt caching is turned on."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Messages API is stateless: each request stands alone. The application must store the conversation and send the relevant history with every request (B). Context windows hold far more than one message (A). There's no memory switch in the API (C). Prompt caching saves cost on repeated content but doesn't store conversations for you (D)."
+  },
+  {
+   "id": "D1-040",
+   "domain": 1,
+   "select": 1,
+   "stem": "A document-processing workflow has six steps and takes 20 minutes per file. When step 5 fails because of a network error, the whole file starts again from step 1, repeating expensive model calls. What design fixes this?",
+   "options": [
+    "Run all six steps in a single model call, so there is only one point where a failure can happen.",
+    "Save each step's output when it finishes, so a retry resumes from the step that failed.",
+    "Add a longer timeout to step 5, so network errors stop happening in that step.",
+    "Process files at night, when network errors happen less often."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Checkpointing each step's result lets the workflow resume where it stopped instead of repeating finished work (B). One giant call makes failures more costly and harder to debug (A). A longer timeout doesn't prevent other failures (C). Running at night may reduce failures but doesn't fix the restart cost (D)."
+  },
+  {
+   "id": "D1-041",
+   "domain": 1,
+   "select": 1,
+   "stem": "An autonomous research agent once ran for 6 hours and made 900 tool calls on a task that normally needs about 40, running up a large bill. What control should have been in place?",
+   "options": [
+    "A system prompt line asking the agent to work efficiently, keep its research focused, and avoid unnecessary tool calls.",
+    "Hard limits in code on steps, tokens or cost per task, stopping the run and reporting when one is hit.",
+    "A larger model, since smarter models finish tasks faster and make fewer tool calls overall.",
+    "A weekly cost report sent to the team, so unusual spending is noticed and investigated."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Agents can loop, so limits on steps, tokens, time or cost must be enforced in code, with a clear stop-and-report when one is reached (B). A prompt request isn't a limit (A). A bigger model may still loop (C). A weekly report finds the overrun long after it happened (D)."
+  },
+  {
+   "id": "D1-042",
+   "domain": 1,
+   "select": 1,
+   "stem": "An HR agent has one tool called hr_action(action, data) that can look up policies, update addresses, change salaries or terminate employees, depending on the action text. Which redesign is best?",
+   "options": [
+    "Keep the single tool, but list every allowed action in its description in much more detail.",
+    "Split it into separate tools with clear names and inputs, and put risky ones behind approval or remove them.",
+    "Keep the single tool, and ask the model to repeat the action back before running it.",
+    "Rename the tool to hr_safe_action, so the model treats every action it takes through the tool more carefully than it does today."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Separate, focused tools are easier for the model to choose correctly, and they let you apply different permissions: lookups run freely, while salary changes or terminations need approval or aren't offered at all (B). A longer description still bundles dangerous and harmless actions together (A). Repeating the action back is a soft check (C). A name doesn't change what the tool can do (D)."
+  },
+  {
+   "id": "D1-043",
+   "domain": 1,
+   "select": 1,
+   "stem": "A shipping tool returns 'Error 400' when the model passes a date in the wrong format. The agent keeps retrying with the same wrong date. What change helps the agent fix its own mistake?",
+   "options": [
+    "Hide errors from the model and quietly retry the same request three more times.",
+    "Return a clear error message that says what was wrong and gives the expected format, such as YYYY-MM-DD.",
+    "Stop the agent completely whenever any tool returns an error, so that no bad or partial data can get into the shipping system.",
+    "Add the date format to the system prompt and leave the tool's error message as it is."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Models act on what tools tell them. An error that explains the problem and the expected format lets the agent correct the input on the next try (B). Hidden retries repeat the same mistake (A). Stopping on every error ends tasks that could easily recover (C). A prompt note helps but the vague error still gives the model nothing to act on when it gets it wrong (D)."
+  },
+  {
+   "id": "D1-044",
+   "domain": 1,
+   "select": 1,
+   "stem": "Users ask a research assistant for reports that take about 10 minutes to produce. The web app keeps the browser request open while it waits, and many requests time out. What design fits better?",
+   "options": [
+    "Raise the web server's timeout to 15 minutes, so the browser requests stay open long enough for every report to finish.",
+    "Start a background job, return a job ID right away, and notify the user or let them check when it's done.",
+    "Ask users not to close or refresh the page until the report has fully finished.",
+    "Make the reports shorter so that every one of them finishes in under 30 seconds."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Long tasks belong in an asynchronous job: accept the request, return an ID, do the work in the background, and notify or let users check progress (B). A 15-minute open request is fragile and ties up servers (A). Relying on users not to refresh fails often (C). Shorter reports change the product instead of fixing the design (D)."
+  },
+  {
+   "id": "D1-045",
+   "domain": 1,
+   "select": 1,
+   "stem": "A software company sells a Claude-based assistant to 300 business customers. Each customer wants its own company name, tone and a few custom rules. Today each customer has a separate copy of the full prompt, and fixes must be made 300 times. What is a better design?",
+   "options": [
+    "Keep separate copies, but assign one engineer to update all 300 copies by hand whenever a fix is made to any of them.",
+    "Use one shared base prompt plus a small per-customer settings block that fills in name, tone and rules.",
+    "Let each customer write and edit their entire prompt themselves, with no shared base prompt.",
+    "Fine-tune a separate model for each customer, so that no per-customer prompt is needed at all."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A shared base prompt with per-customer variables keeps one place to fix and test, while still allowing customization. It also keeps a stable shared prefix that can be cached (B). 300 copies guarantee drift (A). Letting customers edit everything removes your safety and quality rules (C). Separate fine-tuned models are expensive and unnecessary for names, tone and a few rules (D)."
+  },
+  {
+   "id": "D1-046",
+   "domain": 1,
+   "select": 1,
+   "stem": "A pipeline needs to pull the order number from 2 million emails a day. Order numbers always look like 'ORD-' followed by 8 digits. What is the best approach?",
+   "options": [
+    "Send every email to Claude with a prompt asking it to find and return the order number.",
+    "Use a simple pattern match in code, and send only the emails where the pattern fails to Claude.",
+    "Fine-tune a small model to extract order numbers, so the cost per email ends up lower than using the API.",
+    "Ask customers to paste the order number into a separate form field on the website."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "When a fixed pattern describes the data, code is faster, cheaper and exact. Use the model only for the leftovers, such as typos or missing prefixes (B). Sending 2 million emails a day to a model is wasteful (A). Fine-tuning is unnecessary for a fixed pattern (C). A form change doesn't help with emails already arriving (D)."
+  },
+  {
+   "id": "D1-047",
+   "domain": 1,
+   "select": 1,
+   "stem": "A coding assistant loads the whole repository, about 400,000 tokens, into every request 'so it has full context.' Responses are slow, expensive and often miss the relevant file. What approach is better?",
+   "options": [
+    "Load the repository twice in each request, so the relevant files appear more often.",
+    "Give the model search and file-reading tools, so it loads only the files it needs for each task.",
+    "Remove all code comments from the files, so the whole repository fits in fewer tokens.",
+    "Load only the 20 largest files, since the most important code usually lives in the biggest files."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Just-in-time context lets the model find and read what it needs through tools, instead of preloading everything. That keeps the context small and focused (B). Duplicating content adds cost and noise (A). Removing comments saves little and loses useful information (C). File size doesn't show which file matters for a task (D)."
+  },
+  {
+   "id": "D1-048",
+   "domain": 1,
+   "select": 1,
+   "stem": "An orchestrator sends 'research the competitor's pricing' to three subagents. Each one returns overlapping results in different formats, and two of them researched the same pages. What change helps most?",
+   "options": [
+    "Use one subagent instead of three, so that no work is ever duplicated.",
+    "Give each subagent a distinct scope, a required output format, and what to leave out.",
+    "Ask the subagents to message each other while they work, so they can split the task themselves.",
+    "Let the orchestrator remove duplicate results at the end, and keep the instructions the same."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Subagents only know what the orchestrator tells them. Clear boundaries (which competitor, region or source), a fixed output format and explicit exclusions prevent overlap and make the results easy to combine (B). One subagent loses the parallelism (A). Subagents report to the orchestrator and don't coordinate with each other (C). Removing duplicates at the end still pays for the duplicated work (D)."
+  },
+  {
+   "id": "D1-049",
+   "domain": 1,
+   "select": 1,
+   "stem": "A travel assistant must answer 'Is my flight on time right now?' The model's training data ends months before today. What is required?",
+   "options": [
+    "A newer model, since newer models know about current flight delays.",
+    "A tool that looks up live flight status, with the model answering from the tool's result.",
+    "A system prompt line telling the model to make its best guess about current delays from typical flight patterns.",
+    "Fine-tuning the model on last month's flight data, so it knows recent patterns."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Live, changing facts can't come from training data, which is fixed at a cutoff date. The model needs a tool that fetches current data and answers from it (B). Even the newest model doesn't know today's flights (A). A guess is a made-up answer (C). Last month's data is still out of date (D)."
+  },
+  {
+   "id": "D1-050",
+   "domain": 1,
+   "select": 1,
+   "stem": "An insurer wants Claude to read photos of damaged cars and scanned repair estimates. Some photos are blurry and some estimates are handwritten. What should the design plan include?",
+   "options": [
+    "Nothing special, since Claude reads all images perfectly regardless of their quality.",
+    "A test set of real photos and scans, including poor ones, and a human check when the image is unclear.",
+    "Converting every image to black and white before sending it, so the model can read the details more accurately.",
+    "Using text-only processing, since images can't be sent to Claude through the API."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Claude can read images, but accuracy drops on blurry photos and messy handwriting. Test on realistic samples, including bad ones, and route unclear cases to a person (B). Image quality matters (A). Black-and-white conversion can remove useful detail (C). The API does accept images (D)."
+  },
+  {
+   "id": "D1-051",
+   "domain": 1,
+   "select": 2,
+   "stem": "An analyst team wants an agent that researches market trends using web search and writes a briefing. Which TWO design choices most improve how much the team can trust the briefing?",
+   "options": [
+    "Require a citation link for every factual claim, so analysts can check the source.",
+    "Require several independent sources for key claims, and flag claims backed by only one source.",
+    "Tell the agent to write with confidence, so the briefing doesn't seem uncertain to readers.",
+    "Limit the agent to the first search result for each query, to keep the research fast.",
+    "Ask the agent to fill any gaps in the sources from its own training knowledge."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Citations let readers verify each claim (A), and cross-checking key claims across sources catches errors or biased sources, while flagging single-source claims shows where to be careful (B). Forced confidence hides uncertainty (C). One result per query is too thin (D). Filling gaps from training data mixes unverified and possibly outdated facts into the briefing (E)."
+  },
+  {
+   "id": "D1-052",
+   "domain": 1,
+   "select": 1,
+   "stem": "A customer-service agent must remember a user's preferences, such as preferred language and delivery address, across conversations that happen weeks apart. What is the best design?",
+   "options": [
+    "Send the full transcript of every past conversation with each new request.",
+    "Store a short set of preferences per user, and add them to the context at the start of each session.",
+    "Ask the user to repeat their language, address and other preferences at the start of every conversation, so they're always current.",
+    "Rely on the model to remember users between conversations on its own."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A small, structured memory store, retrieved at the start of each session, keeps what matters without flooding the context (B). Full transcripts grow without limit and cost more each time (A). Making users repeat themselves is poor service (C). The model doesn't remember anything between requests (D)."
+  },
+  {
+   "id": "D1-053",
+   "domain": 1,
+   "select": 1,
+   "stem": "A team is choosing a model for a high-volume task: pulling 6 fields from typed invoices. A small, fast model scores 98.5% on their eval set, and the largest model scores 99.0% at 10 times the cost. What should they do?",
+   "options": [
+    "Use the largest model, since the highest accuracy is always the safest choice.",
+    "Use the small model, and send invoices that fail a validation check to the larger model or a person.",
+    "Use the largest model for the first month, then switch to the small model once the team is sure it can save money.",
+    "Use neither, and build a custom extraction model from scratch for this task."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A 0.5-point gain at 10 times the cost rarely pays off at high volume. Using the small model with a validation check, and escalating only the failures, gets close to the higher accuracy at a fraction of the cost (B). Bigger isn't automatically right (A). A month on the large model doesn't answer the question (C). Building a custom model is unnecessary (D)."
+  },
+  {
+   "id": "D1-054",
+   "domain": 1,
+   "select": 1,
+   "stem": "A company wants Claude to draft replies to customer complaints. Replies will be sent automatically if the model is 'confident.' What is the main design flaw?",
+   "options": [
+    "The model's own sense of confidence isn't a reliable signal for whether a reply is safe to send.",
+    "Complaint replies are usually too short and simple to benefit from using a language model in the first place.",
+    "Automatic sending is always slower than having a person send the reply.",
+    "Claude can't write in a polite tone without a large number of examples."
+   ],
+   "answer": [
+    0
+   ],
+   "explanation": "A model saying it's confident doesn't mean it's right. Decide what can be sent automatically using checks in code and measured eval results by category, such as auto-sending only low-risk complaint types that meet a tested quality bar (A). The other options aren't real limitations (B, C, D)."
+  },
+  {
+   "id": "D1-055",
+   "domain": 1,
+   "select": 2,
+   "stem": "A team is scoping an assistant that must answer questions about 500 product manuals and also check live inventory. Which TWO capabilities does the design need?",
+   "options": [
+    "Retrieval over the product manuals, so answers come from the right manual sections.",
+    "A tool that queries the inventory system, so stock levels are current.",
+    "Fine-tuning on the manuals, so the model memorizes every specification.",
+    "A larger context window, so all 500 manuals fit into every request.",
+    "A prompt telling the model to estimate stock levels from past sales."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "The manuals are a large, mostly fixed body of text, so retrieval fits (A). Inventory changes constantly, so it needs a live lookup tool (B). Fine-tuning isn't a reliable way to store exact specifications (C). 500 manuals won't fit in one request efficiently (D). Estimated stock levels would be made-up answers (E)."
+  },
+  {
+   "id": "D2-028",
+   "domain": 2,
+   "select": 1,
+   "stem": "A team adds cache_control to a 600-token system prompt and sees no cache reads at all, even with steady traffic. Everything else is set up correctly. What is the most likely reason?",
+   "options": [
+    "Prompt caching only works when requests are sent through the Message Batches API, not through normal requests.",
+    "The prompt is shorter than the minimum length the model will cache, so nothing is cached.",
+    "Cache reads only begin after the same prompt has been sent more than 1,000 times.",
+    "System prompts can't be cached; only user messages can be marked for caching."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Each model has a minimum cacheable prompt length, and a prefix below it isn't cached even when marked (B). Caching works with normal requests (A). There's no 1,000-request warm-up (C). System prompts are a common thing to cache (D)."
+  },
+  {
+   "id": "D2-029",
+   "domain": 2,
+   "select": 1,
+   "stem": "A system prompt starts with 'You are an expert financial analyst.' Answers are technically correct but too detailed for the actual users, who are new branch staff. What change helps most?",
+   "options": [
+    "Change it to 'You are a world-class expert financial analyst with decades of experience,' so the answers sound more authoritative to staff.",
+    "Describe the audience and goal, such as 'Readers are new branch staff who need a short, plain answer to give a customer.'",
+    "Add 'Be helpful' at the end of the system prompt, so the model focuses on what users need.",
+    "Remove the system prompt completely and rely on the model's default style."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A role alone doesn't tell the model who it's writing for. Describing the audience and what they'll do with the answer shapes length and wording far better (B). A grander title makes it worse (A). 'Be helpful' is too vague to change anything (C). Removing the prompt loses the context entirely (D)."
+  },
+  {
+   "id": "D2-030",
+   "domain": 2,
+   "select": 1,
+   "stem": "A prompt says 'NEVER use ellipses.' The model follows it, but it also avoids pauses and trailing thoughts that the text-to-speech team actually wanted. What prompt style helps the model apply rules sensibly?",
+   "options": [
+    "Write the rule in all capital letters with several exclamation marks, so the model understands that the rule really matters.",
+    "Explain the reason: 'This text is read aloud by a speech engine that can't pronounce ellipses, so don't use them.'",
+    "Repeat the same rule three times in different parts of the prompt, so the model doesn't miss it.",
+    "Remove the rule, and clean up any ellipses with a find-and-replace after the text is generated."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "When the model knows why a rule exists, it can apply it sensibly to related cases, such as avoiding ellipses while still writing natural pauses in a way the speech engine can handle (B). Shouting or repeating the rule makes the model more rigid, not smarter about it (A, C). Post-processing can remove ellipses but doesn't fix the writing (D)."
+  },
+  {
+   "id": "D2-031",
+   "domain": 2,
+   "select": 1,
+   "stem": "A prompt says 'Don't use markdown.' The model still produces bullet lists and bold text in about a third of answers. What rewrite works better?",
+   "options": [
+    "'Do not use markdown, bullets, bold text, headers or any other formatting of any kind.'",
+    "'Write your answer as plain flowing paragraphs of prose, like a short email.'",
+    "'Markdown is strictly forbidden in all answers, and breaking this rule will cause errors.'",
+    "'Avoid markdown if possible, but use it whenever it would make the answer clearer.'"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Telling the model what to do, here plain prose paragraphs, works better than listing what not to do (B). A longer list of don'ts still leaves the target unclear (A). Threats don't improve compliance (C). 'If possible' invites exceptions (D)."
+  },
+  {
+   "id": "D2-032",
+   "domain": 2,
+   "select": 1,
+   "stem": "A model must answer questions about a 90-page lease, and answers often cite the wrong section. Which prompt technique helps most?",
+   "options": [
+    "Ask the model to answer in one sentence, so it has less room to go wrong.",
+    "Ask it to first copy the relevant passages into <quotes> tags, then answer using only those quotes.",
+    "Put the question at the very top of the prompt, above the entire 90-page lease, so the model knows what to look for while reading.",
+    "Split the lease in half and ask the same question about each half separately."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Having the model pull out the relevant quotes first focuses it on the right text and makes its answer easy to check (B). A one-sentence limit doesn't fix finding the right section (A). For long documents, put the document first and the question at the end (C). Splitting the lease can separate related clauses (D)."
+  },
+  {
+   "id": "D2-033",
+   "domain": 2,
+   "select": 1,
+   "stem": "A prompt asks 'What's wrong with this chart?' and then includes the chart image at the end of the message. Results are mediocre. Following common guidance for images, what change is most likely to help?",
+   "options": [
+    "Convert the chart to a text description first and send only that, without the image.",
+    "Put the image first, then the question, and say what to look for, such as axis labels or totals.",
+    "Send the same image three times in one message, so the model looks at the chart more carefully each time.",
+    "Shrink the image to a small thumbnail, so it uses fewer tokens and is processed faster."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Placing the image before the question, and saying what to check, usually gives better results (B). A text description loses visual detail (A). Repeating the image adds cost without helping (C). Shrinking the image can make text and numbers unreadable (D)."
+  },
+  {
+   "id": "D2-034",
+   "domain": 2,
+   "select": 1,
+   "stem": "A team sends annual reports to Claude as PDFs and asks about numbers shown only in bar charts. A developer suggests extracting the text with a PDF library and sending only the text to save tokens. What is the trade-off?",
+   "options": [
+    "None: text extraction keeps everything in the PDF, including charts.",
+    "Charts and images would be lost, so questions about chart values could no longer be answered.",
+    "Text-only requests are slower, because the model must rebuild the page layout itself from the extracted text.",
+    "PDFs can't be sent to Claude directly, so text extraction is the only option anyway."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "With PDF support, Claude sees both the extracted text and an image of each page, so it can read charts. Sending only extracted text drops the charts (B, so A is wrong). Text-only requests aren't slower (C). PDFs can be sent directly (D)."
+  },
+  {
+   "id": "D2-035",
+   "domain": 2,
+   "select": 1,
+   "stem": "A cost estimate assumes 1 token per 0.75 English words. The assistant will also serve users writing in Japanese, Thai and Arabic. What should change in the estimate?",
+   "options": [
+    "Nothing, since token counts are the same in every language.",
+    "Measure token counts on real sample text in each language, since many languages use more tokens per word.",
+    "Assume every non-English language uses half as many tokens as English, since text in those languages is more compact.",
+    "Translate all messages to English first, since only English is billed per token."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Token counts vary by language, and many non-English scripts take more tokens for the same content. Measure on real samples per language rather than reusing the English ratio (B). Token counts differ between languages (A). Assuming fewer tokens underestimates cost (C). Every language is billed per token, and translation adds its own cost and errors (D)."
+  },
+  {
+   "id": "D2-036",
+   "domain": 2,
+   "select": 1,
+   "stem": "An extraction prompt tells the model to write its answer and then the line '### END'. The app discards everything after that line, but it still pays for the extra text the model writes. What API setting helps?",
+   "options": [
+    "Set temperature to 0, so the model stops writing as soon as it reaches the '### END' line in its answer.",
+    "Add '### END' as a stop sequence, so generation stops as soon as the model writes it.",
+    "Lower max_tokens to 50, so the model can't write much past the end of the answer.",
+    "Ask the model in the prompt to please not write anything after the end marker."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A stop sequence ends generation the moment the model outputs that text, so you don't pay for anything after it (B). Temperature doesn't stop generation (A). A low max_tokens can cut off the answer itself (C). A request in the prompt is less reliable than a stop sequence (D)."
+  },
+  {
+   "id": "D2-037",
+   "domain": 2,
+   "select": 1,
+   "stem": "An insurance letter generator sometimes leaves out one of five required disclosures. Adding a step where the model checks its draft against the five-item list fixes almost every miss but adds 20% to cost. Letters are legally required to include all five. What should the team do?",
+   "options": [
+    "Drop the check step, since 20% extra cost is too high for any quality improvement.",
+    "Keep the check, and also confirm in code that each disclosure's required text is present.",
+    "Keep the check step only for letters sent on weekdays, since more customers read their letters on those days.",
+    "Replace the check with a longer prompt, which costs less than a second model call."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "For legally required content, the self-check earns its cost, and a code check for the exact required text gives a hard guarantee (B). Dropping the check accepts legal risk to save a little money (A). The day of the week doesn't change legal requirements (C). A longer prompt is what already fails sometimes (D)."
+  },
+  {
+   "id": "D2-038",
+   "domain": 2,
+   "select": 1,
+   "stem": "An agent picks the wrong tool about 20% of the time between search_orders and search_returns. Both tools' descriptions are one line: 'Searches records.' What change helps most?",
+   "options": [
+    "Rename both tools to longer, more specific names, such as search_orders_tool and search_returns_tool, and keep the rest.",
+    "Write detailed descriptions saying what each one searches, when to use it, and what its inputs mean.",
+    "Add a third tool that decides which of the two search tools to call for each request.",
+    "Lower the temperature, so the model chooses between the two tools more consistently."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Tool descriptions are the main way the model decides which tool to use. Spelling out what each searches, when to use it and what each parameter means, with an example, fixes most selection errors (B). Longer names alone add little (A). A routing tool adds a step without fixing the unclear descriptions (C). Temperature doesn't add the missing information (D)."
+  },
+  {
+   "id": "D2-039",
+   "domain": 2,
+   "select": 1,
+   "stem": "To stay under the context limit, an agent drops the oldest messages from the conversation. Sometimes the API then returns an error about a tool_result without a matching tool_use. What went wrong?",
+   "options": [
+    "The model ran out of tool calls for the session and must be restarted.",
+    "The trimming removed a tool_use message but kept its tool_result, breaking the required pair.",
+    "Tool results must always be the very first message in a conversation.",
+    "The context limit counts only tool results, so trimming the other messages in the conversation has no effect."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Every tool_result must follow the assistant message containing the matching tool_use. Trimming has to remove or keep whole pairs (B). There's no per-session tool-call limit causing this (A). Tool results come after their tool calls, not first (C). The limit counts all tokens (D)."
+  },
+  {
+   "id": "D2-040",
+   "domain": 2,
+   "select": 1,
+   "stem": "A team builds its prompts from a template: fixed instructions, then examples, then the customer's question and account details. A developer wants to move the customer details to the top 'so the model sees them first.' What is the main downside?",
+   "options": [
+    "The model ignores any text that appears in the first half of a prompt.",
+    "Content that changes every request would come before the fixed parts, so the fixed parts could no longer be cached.",
+    "Customer details at the top would be removed by the API's safety filters.",
+    "Templates only work when variable content appears at the very top."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Caching works on a stable prefix. Putting per-request content first changes the start of every prompt, so the fixed instructions and examples can't be cached (B). The model reads the whole prompt (A). The API doesn't filter content by position (C). Templates can put variables anywhere (D)."
+  },
+  {
+   "id": "D3-037",
+   "domain": 3,
+   "select": 1,
+   "stem": "An agent's inventory tool fails because the warehouse database is down. The app returns the text 'no stock found' as a normal tool result. The agent then tells customers the item is out of stock. What should the tool return instead?",
+   "options": [
+    "The same 'no stock found' text as now, with an extra note added to the system prompt explaining that outages happen.",
+    "A tool result marked as an error, saying the inventory system is unavailable and that stock is unknown.",
+    "Nothing at all, so that the agent waits until the database comes back online.",
+    "A guess based on yesterday's stock level, so the customer still gets a useful answer."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A failure should be reported as a failure, with is_error set and a clear message, so the agent can say it can't check stock right now instead of stating something false (B). 'No stock found' looks like a real answer (A). Returning nothing breaks the conversation flow (C). A guess presented as fact misleads the customer (D)."
+  },
+  {
+   "id": "D3-038",
+   "domain": 3,
+   "select": 1,
+   "stem": "A developer gets an API error saying a tool_result block refers to an unknown tool_use. Their code builds tool results with an ID it generates itself. What is the fix?",
+   "options": [
+    "Generate IDs in a different format, such as random UUIDs.",
+    "Copy the id from each tool_use block into the matching tool_result's tool_use_id field.",
+    "Leave out the ID field completely, since the API can match each result to its call by the order they appear in.",
+    "Put the tool results in the system prompt instead of in a user message."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Each tool_result must reference the exact id of the tool_use block it answers (B). Your own IDs, in any format, won't match (A). The ID is required (C). Tool results go in the next user message, not the system prompt (D)."
+  },
+  {
+   "id": "D3-039",
+   "domain": 3,
+   "select": 1,
+   "stem": "A batch job sends a few very large requests each minute and keeps getting rate-limit errors, even though it sends far fewer requests than its request-per-minute limit. What is the most likely cause?",
+   "options": [
+    "The API key has expired and needs to be replaced with a new one.",
+    "The job exceeds its tokens-per-minute limit, which is counted separately from the request count.",
+    "Rate limits only apply to small requests, so each large request is counted three times against the request limit.",
+    "The model is turned off at certain times of day for maintenance."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Rate limits apply to both requests and tokens per minute. A few huge requests can use up the token allowance while staying far below the request count (B). An expired key gives an authentication error, not a rate-limit error (A). There's no tripling rule (C). This isn't scheduled downtime (D)."
+  },
+  {
+   "id": "D3-040",
+   "domain": 3,
+   "select": 1,
+   "stem": "An integration treats every non-200 response the same way. Which statement about two common API errors is correct?",
+   "options": [
+    "Both 429 and 529 mean the request was malformed and should never be retried.",
+    "A 429 means you hit your rate limit; a 529 means the API is temporarily overloaded. Both can be retried with backoff.",
+    "A 429 means the API key is invalid, and a 529 means the model doesn't exist.",
+    "A 529 means you exceeded your monthly spending limit and must contact sales."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A 429 is your own rate limit (check the retry-after header), and a 529 is a temporary overload on the service side. Both are retryable with backoff, and a 529 may also justify falling back to another region or platform (B). Malformed requests are 400 errors (A). An invalid key is 401 (C). Overload isn't a billing issue (D)."
+  },
+  {
+   "id": "D3-041",
+   "domain": 3,
+   "select": 1,
+   "stem": "A support system receives emails through a webhook. During a product recall, email volume jumps 20 times, the webhook calls Claude directly, and many requests fail. What design handles spikes better?",
+   "options": [
+    "Call Claude directly from the webhook, and increase the webhook's timeout setting.",
+    "Put incoming emails on a queue, and have workers process them at a rate within your API limits.",
+    "Ask customers to send fewer emails during busy periods, by adding a notice to the website and the email footer.",
+    "Turn off the assistant during spikes and send every email to the human team."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A queue absorbs bursts: emails are accepted immediately, and workers process them steadily within rate limits, with retries (B). Longer timeouts don't add capacity (A). You can't control incoming volume (C). Turning the assistant off during the busiest period defeats its purpose (D)."
+  },
+  {
+   "id": "D3-042",
+   "domain": 3,
+   "select": 1,
+   "stem": "An HR assistant's index covers policies for 12 countries. A user in Canada asks about parental leave and gets the German policy, which matches the query text better. What is the best fix?",
+   "options": [
+    "Retrieve 50 chunks instead of 5, so that the Canadian policy is much more likely to appear among the results.",
+    "Tag each chunk with its country, and filter retrieval to the user's country before searching.",
+    "Add 'focus on Canada' to the end of every query before it is sent to the search index.",
+    "Delete the policies for the other 11 countries from the index."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Metadata filtering limits the search to chunks from the right country before ranking, so a better text match from another country can't win (B). More chunks add noise and still might not rank Canada first (A). Adding words to the query is unreliable (C). Deleting other countries breaks the assistant for everyone else (D)."
+  },
+  {
+   "id": "D3-043",
+   "domain": 3,
+   "select": 1,
+   "stem": "In a policy chatbot, a user asks 'How much PTO do full-time staff get?' and then 'What about part-time?' Retrieval for the second question returns random results. What fixes this?",
+   "options": [
+    "Search with only the latest message, but retrieve more chunks than before.",
+    "Rewrite the follow-up into a standalone question, such as 'How much PTO do part-time staff get?', before searching.",
+    "Tell users in the interface to always type complete questions.",
+    "Search with the entire conversation history pasted in as the query."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Follow-ups depend on earlier turns. Rewriting them into a standalone query, using a quick model call, gives retrieval something it can match (B). More chunks for 'What about part-time?' is still a poor query (A). Users won't reliably change how they type (C). The whole conversation as a query dilutes the search with old topics (D)."
+  },
+  {
+   "id": "D3-044",
+   "domain": 3,
+   "select": 1,
+   "stem": "A legal team needs every answer to show the exact sentence from the source document that supports it, so they can check it quickly. What is the most reliable way to get this?",
+   "options": [
+    "Ask the model to include quotes in its answer, and trust that each quote is copied exactly from the source.",
+    "Turn on citations for the documents, so the API returns the exact cited text with its location.",
+    "Ask the model to add page numbers after each claim, and link those pages in the interface.",
+    "Run a second prompt that asks whether the first answer is correct."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The citations feature returns cited spans taken from the documents you provided, with their locations, so they can be checked reliably (B). Quotes the model writes itself can be slightly wrong (A). Page numbers written by the model can also be wrong (C). A second opinion doesn't produce the supporting sentence (D)."
+  },
+  {
+   "id": "D3-045",
+   "domain": 3,
+   "select": 1,
+   "stem": "An app asks many questions about the same 200-page product catalog over a day, uploading the full file with every request. What API feature reduces this repeated upload work?",
+   "options": [
+    "The Batches API, which sends the catalog only once per day.",
+    "The Files API, which lets you upload the catalog once and refer to it by its file ID in later requests.",
+    "Streaming, which sends the catalog to the API in smaller pieces.",
+    "Stop sequences, which tell the model to stop reading the catalog early."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Files API stores a file once, and later requests refer to it by ID instead of re-uploading it (B). Combining it with prompt caching also cuts the repeated input cost. Batches are for asynchronous bulk jobs (A). Streaming is about receiving output (C). Stop sequences control output, not input (D)."
+  },
+  {
+   "id": "D3-046",
+   "domain": 3,
+   "select": 1,
+   "stem": "A compliance assistant uses the web search tool. Answers sometimes cite blogs and forums instead of official regulator websites. What is the most direct fix?",
+   "options": [
+    "Ask the model in the prompt to prefer official sources whenever it can.",
+    "Set the web search tool's allowed domains to the regulators' official websites.",
+    "Turn off web search and rely on the model's training knowledge instead.",
+    "Lower the maximum number of searches per request, so that fewer sources are used."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Restricting the tool to allowed domains enforces the source list in the API call itself (B). A prompt preference is soft (A). Training knowledge can be out of date for regulations (C). Fewer searches don't change which sites are used (D)."
+  },
+  {
+   "id": "D3-047",
+   "domain": 3,
+   "select": 1,
+   "stem": "A finance team uploads a 50,000-row CSV and asks for monthly totals by region. Answers come back with plausible-looking but wrong totals. What tool should the assistant use?",
+   "options": [
+    "None: ask the model to add up all the rows more carefully, step by step, and show its working in the answer.",
+    "The code execution tool, so the model writes and runs code to calculate the totals exactly.",
+    "Web search, so the model can look up how to calculate monthly totals correctly.",
+    "Citations, so the model shows which rows it used for each total."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Exact arithmetic over thousands of rows should be done in code. The code execution tool lets the model write and run analysis code and report the real results (B). Careful reasoning in text still produces errors at this scale (A). Web search doesn't do math (C). Citations don't fix wrong sums (D)."
+  },
+  {
+   "id": "D3-048",
+   "domain": 3,
+   "select": 1,
+   "stem": "A team builds an MCP server for its wiki. Users want to attach specific wiki pages to a chat as background, and the model also needs to search the wiki on its own. Which MCP features fit?",
+   "options": [
+    "Expose everything as tools, since tools are the only way an MCP server can give the model access to data.",
+    "Expose pages as resources the app can attach, and expose search as a tool the model can call.",
+    "Expose everything as prompts, since prompts are always loaded into context automatically.",
+    "Expose search as a resource and pages as tools, since resources are what the model calls."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Resources are data the application or user chooses to attach as context, which fits specific wiki pages. Tools are actions the model decides to call, which fits search (B). Tools aren't the only option (A). Prompts are reusable templates the user invokes (C). (D) has resources and tools reversed."
+  },
+  {
+   "id": "D3-049",
+   "domain": 3,
+   "select": 1,
+   "stem": "Analysts repeatedly type the same long instructions to start a quarterly-review analysis with their data MCP server. What MCP feature lets the server offer this as a reusable starting point?",
+   "options": [
+    "A tool, which the model calls on its own whenever it decides that a quarterly review is needed.",
+    "A prompt, a reusable template that users can pick, often shown as a slash command.",
+    "A resource, which loads the instructions as a file attachment on every chat.",
+    "A sampling request, which asks the model to invent the instructions itself."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "MCP prompts are templates the server offers for users to pick, often shown as slash commands, with arguments such as the quarter (B). Tools are invoked by the model, not chosen by the user as a starting template (A). A resource is data, not a workflow template (C). Sampling is for the server asking the client's model to generate text, not for offering templates (D)."
+  },
+  {
+   "id": "D3-050",
+   "domain": 3,
+   "select": 1,
+   "stem": "A company MCP server for the CRM returns raw stack traces when a customer ID isn't found. The model then tells users 'a system error occurred' and gives up. What should the server return?",
+   "options": [
+    "An empty result, so the model assumes the customer simply has no data.",
+    "A clear error message, such as 'No customer with ID 4471. Check the ID or search by email.'",
+    "The full stack trace plus the server's recent log file, so the model has as much detail as possible to work from.",
+    "An HTTP 500 error, so the client shows its own generic error message."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Errors written for the model to act on, saying what was wrong and what to try next, let the agent recover, for example by searching by email (B). An empty result hides the problem (A). Stack traces and logs are noise to the model and can leak internal details (C). A generic 500 gives the model nothing to act on (D)."
+  },
+  {
+   "id": "D3-051",
+   "domain": 3,
+   "select": 1,
+   "stem": "A team's first call to Claude on Amazon Bedrock fails with an AccessDeniedException. The code works with the direct Claude API. What should they check first?",
+   "options": [
+    "Whether the Claude API key is included in the Bedrock request headers.",
+    "Whether their AWS role has permission to invoke that Claude model in that region.",
+    "Whether the prompt is too long for Bedrock, which has a lower token limit than the direct Claude API does.",
+    "Whether the model name is written in lowercase letters in the request."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Bedrock uses AWS authentication and IAM permissions, not the Claude API key. An access-denied error points to missing permission to invoke the model in that region (B). Anthropic API keys aren't used on Bedrock (A). An overly long prompt gives a different error (C). Letter case of the model name isn't the problem here (D)."
+  },
+  {
+   "id": "D3-052",
+   "domain": 3,
+   "select": 1,
+   "stem": "A team building semantic search for their Claude app asks which embedding model Anthropic provides. What is accurate?",
+   "options": [
+    "Claude's main models produce embeddings when you set a special embedding flag on the request.",
+    "Anthropic doesn't offer its own embedding model, so teams use a third-party provider, such as Voyage AI.",
+    "Embeddings aren't needed for retrieval at all, since Claude can search through any number of documents directly.",
+    "Every Claude model returns an embedding vector alongside its normal text response."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Anthropic doesn't provide an embedding model. Its documentation points to third-party providers, such as Voyage AI, for embeddings (B). There's no embedding flag on Claude models (A, D). Retrieval at scale still needs an index, such as embeddings or keyword search (C)."
+  },
+  {
+   "id": "D3-053",
+   "domain": 3,
+   "select": 1,
+   "stem": "An agent's cache hit rate drops to zero after the team starts adding a 'current_date' line to one tool's description on every request. Why?",
+   "options": [
+    "Tool descriptions can never be part of a cached prompt, with or without the date, so the cache only ever covered the system prompt.",
+    "Tools come first in the cached prefix, so any change to them invalidates the cache for everything after.",
+    "The date makes the request too long to fit into the prompt cache.",
+    "The cache only works on requests sent before noon UTC."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The cache is built in order: tools, then system, then messages. Changing a tool definition on each request changes the very start of the prefix, so nothing after it can be reused (B). Tools can be cached (A). Adding a date doesn't exceed any size limit (C). There's no time-of-day rule (D). Put changing values like the date later, such as in the user message."
+  },
+  {
+   "id": "D3-054",
+   "domain": 3,
+   "select": 1,
+   "stem": "A mobile app calls the Claude API directly, with the API key stored inside the app. What is the main risk and the standard fix?",
+   "options": [
+    "The key may expire sooner on mobile devices; the fix is to rotate it every day.",
+    "Anyone can extract the key from the app; the fix is to call your own backend, which holds the key.",
+    "Mobile networks are too slow for the API; the fix is to turn on streaming for every request the app sends to Claude.",
+    "The API doesn't accept requests from phones; the fix is to make all calls over a VPN."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Anything shipped inside an app can be extracted, giving others unlimited use of your account. The app should call your backend, which holds the key, checks the user's identity and enforces limits (B). Daily rotation doesn't fix exposure (A). Network speed isn't the issue (C). The API doesn't block phones (D)."
+  },
+  {
+   "id": "D3-055",
+   "domain": 3,
+   "select": 1,
+   "stem": "A team submits 10,000 requests through the Message Batches API at 9 a.m. and expects the results for a 9:15 a.m. meeting. What should they know?",
+   "options": [
+    "Batches always finish within 5 minutes because they run with the highest priority.",
+    "Many batches finish well within an hour, but a batch can take up to 24 hours, so it doesn't fit a tight deadline.",
+    "Batches can't start until midnight UTC, so results will arrive the next morning.",
+    "Batches finish in exactly 24 hours, regardless of their size."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Batches trade speed for a 50% discount. Many finish quickly, but the guarantee is only that they complete within 24 hours, so they don't suit a fixed short deadline (B). They don't get priority (A). They don't wait for midnight (C). They don't take exactly 24 hours (D)."
+  },
+  {
+   "id": "D3-056",
+   "domain": 3,
+   "select": 1,
+   "stem": "A RAG assistant often quotes an outdated policy section when both an old and a new version are indexed. The chunks contain only the body text. What helps the model choose the right one?",
+   "options": [
+    "Ask the model to always prefer whichever chunk is the longest.",
+    "Include each chunk's document title, version and effective date in the text the model sees.",
+    "Shuffle the order of the retrieved chunks, so the model doesn't favor whichever version happens to come first.",
+    "Retrieve only one chunk per question, so the model has no choice to make."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "With source details such as title, version and effective date attached to each chunk, the model can prefer the current version and cite it properly (B). Removing old versions from the index, or filtering them out, is better still. Length doesn't show which is current (A). Shuffling doesn't help (C). Retrieving one chunk may pick the old one (D)."
+  },
+  {
+   "id": "D3-057",
+   "domain": 3,
+   "select": 1,
+   "stem": "A RAG pipeline sends the top 40 retrieved chunks straight to the model. Answers are slow and sometimes use loosely related chunks. Recall is good. What change helps most?",
+   "options": [
+    "Send the top 100 chunks instead, so that the right chunk is never missed.",
+    "Retrieve 40 chunks, rerank them for relevance, and send only the top 5 to 8 to the model.",
+    "Send only the first chunk, since the top search result is almost always the correct one for the question asked.",
+    "Remove the retrieval step and send the whole knowledge base in every request."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Retrieving broadly and then reranking to a short list keeps recall high while giving the model only the most relevant chunks, which is faster, cheaper and less distracting (B). More chunks makes the noise worse (A). One chunk loses recall (C). Sending the whole knowledge base doesn't scale (D)."
+  },
+  {
+   "id": "D3-058",
+   "domain": 3,
+   "select": 1,
+   "stem": "An analytics agent's SQL tool returns every matching row. A question about 'all orders last year' returns 300,000 rows, which floods the context and fails. What is the best fix in the tool?",
+   "options": [
+    "Return all 300,000 rows, but in smaller pieces of a few thousand rows each, spread across several separate tool calls.",
+    "Cap the rows returned, tell the model the total count, and encourage queries that summarize in SQL.",
+    "Convert the 300,000 rows into a compressed file and attach it to the model's context.",
+    "Return only the first row of every query, so the context can never be flooded."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Tools should return what the model can use: a capped sample, the total row count and a nudge to aggregate in SQL, such as using GROUP BY, keep the context manageable (B). Splitting 300,000 rows across calls still floods the context (A). The model can't usefully read a compressed file (C). One row hides most of the information (D)."
+  },
+  {
+   "id": "D3-059",
+   "domain": 3,
+   "select": 2,
+   "stem": "An agent reads web pages with a fetch tool. Which TWO practices are most important for using the page content safely?",
+   "options": [
+    "Treat page content as untrusted data that may contain instructions, and don't let it change the agent's task.",
+    "Require confirmation, or a code check, before any action triggered after reading a page, such as sending data.",
+    "Trust pages from popular websites completely, since large sites can't contain hidden instructions.",
+    "Let the agent follow any links and instructions it finds on a page, so research goes faster.",
+    "Turn off the fetch tool's error messages, so pages that fail to load can't confuse the agent."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Web pages can contain hidden instructions, so their content must be treated as data, not commands (A). Sensitive actions taken after reading untrusted content need a check that doesn't rely on the model's judgment (B). Popular sites can still host injected content, such as in user comments (C). Following any instruction on a page is exactly the risk (D). Hiding errors makes failures harder to handle (E)."
+  },
+  {
+   "id": "D3-060",
+   "domain": 3,
+   "select": 1,
+   "stem": "An HR knowledge base is updated through an admin portal. Today a nightly job rebuilds the entire 2-million-chunk index, which takes 5 hours and costs a lot in embedding calls. Only about 50 documents change each day. What is a better design?",
+   "options": [
+    "Rebuild the full index twice a day instead of once, so the answers are never more than 12 hours out of date with the portal.",
+    "Re-index only the documents that changed, triggered by the portal's update events, and remove deleted ones.",
+    "Stop updating the index, and tell users to check the portal for any recent changes.",
+    "Store the documents in the system prompt instead of in an index, so no indexing is needed."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Incremental indexing updates just the changed documents when they change, including removing deleted ones. It's faster, cheaper and fresher than full rebuilds (B). Rebuilding twice a day doubles the cost (A). Not updating leaves answers stale (C). 2 million chunks won't fit in a system prompt (D)."
+  },
+  {
+   "id": "D4-031",
+   "domain": 4,
+   "select": 1,
+   "stem": "A support assistant's eval set was built 9 months ago from launch-day questions. It still scores 95%, but customer complaints have risen since a new product line launched. What is the most likely problem with the eval?",
+   "options": [
+    "The eval set is too large, so problems are hidden among too many easy questions.",
+    "The eval set no longer reflects what users ask now, so add recent real questions, including the new product line.",
+    "The scoring method is broken and should be replaced with a newer LLM judge right away, since the score hasn't moved in nine months.",
+    "95% is too high a score to be trusted, so the threshold should be raised to 99%."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "An eval set built from old traffic stops representing current use. Regularly add recent production questions, especially new topics, so the eval tracks what users actually ask (B). Size isn't the issue (A). Nothing points to a broken scorer (C). Raising the threshold doesn't add the missing questions (D)."
+  },
+  {
+   "id": "D4-032",
+   "domain": 4,
+   "select": 1,
+   "stem": "An engineer tweaks a prompt 40 times, re-running the same 150-question eval set after each change, until the score reaches 97%. In production, accuracy is about 88%. What went wrong?",
+   "options": [
+    "The production model is a different, lower-quality version from the one used in testing, which explains the nine-point gap.",
+    "The prompt was tuned to fit the 150 questions; a separate held-out test set was needed to check real performance.",
+    "150 questions is too many, which made the eval results unstable from run to run.",
+    "The engineer should have tweaked the prompt more times, until it reached 100%."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Repeatedly tuning against the same questions fits the prompt to those questions. Keep a held-out set that's never used for tuning, and use it to estimate real performance (B). Nothing suggests a different model (A). 150 is a reasonable size (C). More tuning on the same set makes the overfitting worse (D)."
+  },
+  {
+   "id": "D4-033",
+   "domain": 4,
+   "select": 1,
+   "stem": "Two expert reviewers label the same 200 contract clauses as 'risky' or 'not risky' and disagree on 22% of them. The team's target for the model is 98% agreement with the reviewers. What should happen?",
+   "options": [
+    "Keep the 98% target, since the model should be held to a higher standard than people.",
+    "Clarify the labeling rules until reviewers agree more, then set a target the reference labels can support.",
+    "Use only the first reviewer's labels and ignore the second reviewer's, since the two of them disagree so often.",
+    "Replace both reviewers with an LLM judge, which will always agree with itself."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "If experts disagree 22% of the time, the labels themselves are uncertain, and 98% agreement isn't meaningful. Tighten the rubric with examples until reviewers agree more, then set realistic targets (B). The target can't exceed what the reference can support (A). Picking one reviewer hides the problem (C). A judge that agrees with itself doesn't make the labels right (D)."
+  },
+  {
+   "id": "D4-034",
+   "domain": 4,
+   "select": 1,
+   "stem": "An LLM judge scores customer replies from 1 to 5. Reviewers notice it gives higher scores to longer replies, even when shorter ones are better. What helps most?",
+   "options": [
+    "Use a longer judge prompt, so the judge has more instructions to follow.",
+    "Give the judge a specific rubric that rewards required content, says length isn't a goal, and check it against human scores.",
+    "Truncate all replies to the same length before the judge sees them.",
+    "Average the judge's scores with a random number to cancel out the length bias."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Judges have biases, such as favoring longer answers. A rubric that defines what earns points and states length isn't a goal, checked against human-scored examples, reduces the bias and shows how well it works (B). A longer prompt doesn't fix the criteria (A). Truncation cuts off real content (C). Adding randomness adds noise (D)."
+  },
+  {
+   "id": "D4-035",
+   "domain": 4,
+   "select": 1,
+   "stem": "An eval checks whether an extraction prompt outputs valid JSON with a correct invoice date. The team currently uses an LLM judge for both checks. What is a better approach?",
+   "options": [
+    "Keep using the LLM judge, since judges are more flexible than code for every kind of check, including dates.",
+    "Check JSON validity and the exact date with code, and save LLM judges for things code can't check.",
+    "Have a person review every output by hand, since code can't check dates correctly.",
+    "Drop the date check entirely and only check that the JSON is valid."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "When a check has a clear right answer, such as valid JSON or an exact date, code is cheaper, faster and fully consistent. LLM judges are for qualities like tone or completeness (B). Using a judge here adds cost and variation (A). Code compares dates easily (C). Dropping the date check misses errors (D)."
+  },
+  {
+   "id": "D4-036",
+   "domain": 4,
+   "select": 1,
+   "stem": "An agent handles refund requests over several turns, using tools to update the order system. How should the eval decide whether a test conversation succeeded?",
+   "options": [
+    "Check whether the agent's last message says the refund was processed.",
+    "Check the final state of the test order system: the right refund, amount and status, and no unwanted changes.",
+    "Count how many turns each test conversation took, since shorter conversations mean the agent resolved the refund successfully.",
+    "Ask the agent at the end whether it thinks the task went well, and record its answer."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "For agents that change things, the reliable test is the outcome: inspect the system state after the conversation, including that nothing else was changed (B). The agent can claim success without actually achieving it (A, D). Turn count measures efficiency, not success (C)."
+  },
+  {
+   "id": "D4-037",
+   "domain": 4,
+   "select": 1,
+   "stem": "An agent solved a test task correctly, but it took a very different path from the 'expected' sequence of tool calls in the test. The eval marked it as failed. What should change?",
+   "options": [
+    "Nothing: agents should always follow the exact expected sequence of tool calls, so marking this run as a failure is correct.",
+    "Grade mainly on whether the outcome is correct, and separately track cost or steps instead of requiring one path.",
+    "Remove all agent tests from the eval, since agents can't be tested reliably.",
+    "Add more expected paths to the test until this run is counted as a pass."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Agents can solve a task in many valid ways. Grading the outcome avoids penalizing good alternatives, while tracking steps or cost catches wasteful ones (B). Requiring one path makes tests fragile (A). Agents can be tested, with outcome checks (C). Listing every path doesn't scale (D)."
+  },
+  {
+   "id": "D4-038",
+   "domain": 4,
+   "select": 1,
+   "stem": "An agent completes a task correctly in 1 of 4 tries on some tests. For a customer-facing workflow, the agent must succeed every time it's run. Which metric reflects that need?",
+   "options": [
+    "pass@4, the chance that at least one of four tries succeeds.",
+    "pass^4, the chance that all four tries succeed.",
+    "Average tokens per try, since cheaper tries are more reliable.",
+    "The best score out of the four tries."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "pass@k rewards succeeding at least once in k tries, which fits when a person can pick the best result. pass^k requires every try to succeed, which matches 'must work every time' (B). pass@4 would overstate reliability here (A). Token use isn't reliability (C). The best of four hides the failures (D)."
+  },
+  {
+   "id": "D4-039",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team sends every question to a small model first and escalates to a large model when the small model's answer fails a validation check. How should they judge whether this setup is better than using the large model for everything?",
+   "options": [
+    "By checking that the small model answers more than half of the questions on its own.",
+    "By comparing overall accuracy and total cost on the same eval set for both setups.",
+    "By measuring the small model's accuracy alone, since the large model is already known to be good.",
+    "By counting how many questions escalate, since fewer escalations always means better."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A cascade only makes sense if it gives similar accuracy at lower cost, or better value overall, so compare both setups end to end on the same eval set (B). Share handled (A), the small model alone (C) or the escalation count (D) each miss part of the picture."
+  },
+  {
+   "id": "D4-040",
+   "domain": 4,
+   "select": 1,
+   "stem": "Several engineers edit prompts for a production assistant, and twice a change has quietly broken an important use case. What process change catches this before release?",
+   "options": [
+    "Ask engineers to test their changes by hand on a few example questions they choose themselves, before each prompt change goes out.",
+    "Run the eval suite automatically on every prompt change, and block the release if key scores drop.",
+    "Allow prompt changes only on Fridays, so problems can be fixed over the weekend.",
+    "Keep a changelog of prompt edits so the team knows who to ask after a break."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Automated eval checks on every change, with release gates on key metrics, catch regressions before users see them (B). Hand-picked tests miss the cases people don't think of (A). The day of the week doesn't catch anything (C). A changelog helps after the fact but doesn't prevent the break (D)."
+  },
+  {
+   "id": "D4-041",
+   "domain": 4,
+   "select": 1,
+   "stem": "An assistant passed all offline evals at launch. How should the team keep track of quality in production?",
+   "options": [
+    "Re-run the same launch eval set once a year, and compare each year's score with the score the assistant got at launch.",
+    "Regularly sample real conversations, score them with checks or a judge, and have people review a share.",
+    "Track only the number of thumbs-down clicks, since unhappy users always click it.",
+    "Assume quality stays the same, since the model and prompt haven't changed."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Production questions change over time. Ongoing sampling and scoring of real traffic, with human review of a share of it, catches drift and new failure types (B). A yearly re-run of old questions misses new topics (A). Most unhappy users never click thumbs-down (C). Inputs and data change even when the model doesn't (D)."
+  },
+  {
+   "id": "D4-042",
+   "domain": 4,
+   "select": 1,
+   "stem": "After a safety update, a medical-information assistant now correctly refuses more harmful requests, but it also refuses many harmless ones, such as 'What is a normal resting heart rate?' What should the eval add?",
+   "options": [
+    "Nothing: refusing more often is always the safer choice for a medical assistant, even when some harmless questions get refused too.",
+    "A set of harmless questions that sound sensitive, to measure how often the assistant refuses them wrongly.",
+    "A measure of how polite the refusals are, so they sound kinder to users.",
+    "Fewer harmful test prompts, so the refusal rate on them looks lower."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Safety evals should measure both sides: harmful requests that should be refused, and harmless but sensitive-sounding ones that should be answered. Over-refusal fails users too (B). Refusing everything isn't safe or useful (A). Politeness doesn't fix wrong refusals (C). Removing tests hides the problem (D)."
+  },
+  {
+   "id": "D4-043",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team tests a new prompt on 100 questions and gets 82% correct. A manager asks how confident they can be that the true accuracy is about 82%. What is a fair answer?",
+   "options": [
+    "It's exactly 82%, since every one of the 100 questions was graded carefully and the grading itself didn't contain any errors.",
+    "Roughly plus or minus 8 points, so the true accuracy could be anywhere from the mid-70s to about 90%.",
+    "Plus or minus 1 point, since 100 questions is a large sample for an eval.",
+    "It can't be estimated at all without testing every possible user question."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "With 100 items, the 95% margin of error is about ±1.96 × √(0.82 × 0.18 / 100), roughly ±7.5 points. Small eval sets give wide ranges, so small differences between prompts may not be real (B). It isn't exact (A) or that tight (C), and a reasonable estimate doesn't need every possible question (D)."
+  },
+  {
+   "id": "D4-044",
+   "domain": 4,
+   "select": 1,
+   "stem": "A new prompt raises overall accuracy from 88% to 90%. Broken down by language, English improved, but Spanish dropped from 87% to 79%. Spanish speakers are 20% of users. What should happen before shipping?",
+   "options": [
+    "Ship, since the overall score went up and English speakers are the majority of users.",
+    "Investigate and fix the Spanish drop, since an overall gain can hide a serious drop for a group.",
+    "Remove the Spanish questions from the eval set, since they're the part that is pulling the overall score down.",
+    "Ship to English speakers only and stop supporting Spanish until the next release."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "An overall score can hide a large drop in one group. An 8-point drop for 20% of users is a real regression, so fix it or ship to segments separately (B). Shipping ignores it (A). Removing the questions hides it (C). Dropping a language you support is a business decision, not a fix (D)."
+  },
+  {
+   "id": "D4-045",
+   "domain": 4,
+   "select": 1,
+   "stem": "A citation-heavy research assistant passes an eval that checks whether each answer includes citations. Users still find that some citations don't actually support the claim next to them. What should the eval check?",
+   "options": [
+    "That every answer includes at least three separate citations.",
+    "That each cited passage actually supports the specific claim it's attached to.",
+    "That every citation links to a page that loads without an error.",
+    "That the citations are formatted in one consistent style throughout every answer the assistant gives."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Having citations isn't the same as having correct ones. Check that each cited source supports its claim, using a judge, code that compares the text, or human review (B). More citations (A), working links (C) or tidy formatting (D) don't show the source backs the claim."
+  },
+  {
+   "id": "D4-046",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team needs 500 test questions for a new insurance assistant but has only 40 real examples. They plan to have Claude write 460 more. What makes this approach sound?",
+   "options": [
+    "Use the 460 generated questions as they are, since the model writes realistic questions that cover the same ground as real customers.",
+    "Have Claude draft them from the real examples and edge-case lists, and have domain experts review and fix them.",
+    "Generate 5,000 questions instead, since more questions always make a better eval set.",
+    "Generate the questions and their expected answers with the same model being tested."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Generated questions are a fast start, but they need expert review for realism, correct answers and coverage of hard cases (B). Unreviewed questions can be unrealistic or wrong (A). Quantity doesn't fix quality (C). Answers written by the model under test can share its mistakes and inflate scores (D)."
+  },
+  {
+   "id": "D4-047",
+   "domain": 4,
+   "select": 1,
+   "stem": "A full eval suite of 3,000 cases costs about $90 and takes 40 minutes. Engineers want feedback on every commit, which happens dozens of times a day. What is a sensible setup?",
+   "options": [
+    "Run all 3,000 cases on every commit, and accept the cost and the waiting time.",
+    "Run a small, fast set of key cases on every commit, and the full suite nightly and before each release.",
+    "Run the eval suite only once a month, to keep costs as low as possible.",
+    "Skip evals for small prompt edits entirely, since only large changes to a prompt are able to cause any regressions in quality."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Tiered evals balance speed and coverage: a quick set of critical cases on each commit catches obvious breaks, and the full suite catches the rest before release (B). Running everything on every commit is slow and costly (A). Monthly runs catch problems too late (C). Small edits can cause big regressions (D)."
+  },
+  {
+   "id": "D4-048",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team re-runs a 3,000-case eval every night with interactive API calls. Results aren't needed until the next morning. How can they cut the eval cost the most without changing the results?",
+   "options": [
+    "Run only every other case, which halves the cost of each nightly run.",
+    "Submit the nightly run through the Message Batches API, which costs about half as much.",
+    "Switch the nightly eval to a smaller, cheaper model, so that each of the 3,000 test cases costs less to run.",
+    "Run the eval only on weekends, when API prices are lower."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Nightly evals don't need instant answers, so the Batches API's 50% discount fits perfectly, with the same model and the same cases (B). Running half the cases weakens the eval (A). A smaller model changes what you're measuring (C). Prices don't change on weekends (D)."
+  },
+  {
+   "id": "D4-049",
+   "domain": 4,
+   "select": 1,
+   "stem": "A team tests extended thinking budgets of 1,000, 4,000, 16,000 and 32,000 tokens on a reasoning task. Accuracy is 81%, 89%, 91% and 91.5%, and cost and latency rise with each step. Which budget should they pick?",
+   "options": [
+    "32,000, since it gives the highest accuracy of the four budgets tested, and accuracy matters more than cost on reasoning tasks.",
+    "Around 4,000 to 16,000, where the accuracy gains level off compared with the extra cost and delay.",
+    "1,000, since it is the cheapest and the fastest of the four options.",
+    "No thinking at all, since the gains don't justify any extra cost."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Look for where the gains flatten: going from 1K to 4K adds 8 points, while 16K to 32K adds only half a point for much more cost and delay. Choose in the middle range, depending on how much each point is worth (B). Maximizing accuracy alone ignores cost (A). The cheapest option leaves a big gain on the table (C). The data shows thinking does help (D)."
+  },
+  {
+   "id": "D4-050",
+   "domain": 4,
+   "select": 1,
+   "stem": "A summarizer's output costs dominate spending. Users read only the first paragraph, but summaries average 600 tokens. What change should the team test first?",
+   "options": [
+    "Turn on prompt caching for the input documents, which cuts the input cost.",
+    "Ask for a 2 to 3 sentence summary and check on the eval set that quality holds.",
+    "Switch to the Batches API, since users can wait until the next day to read their finished summaries.",
+    "Raise max_tokens so that summaries are never cut off in the middle."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Output is the main cost, and most of it isn't read. Asking for shorter summaries, and confirming on the eval set that they keep the key points, attacks the biggest cost directly (B). Caching only lowers input cost (A). Batches don't suit users waiting for summaries (C). A higher max_tokens doesn't lower cost (D)."
+  },
+  {
+   "id": "D5-033",
+   "domain": 5,
+   "select": 1,
+   "stem": "A startup is building a consumer app that gives people personalized advice about their health insurance claims. Under Anthropic's Usage Policy, what extra requirements apply to this kind of high-risk, consumer-facing use?",
+   "options": [
+    "None, as long as the app has a privacy policy and terms of service.",
+    "Qualified human review of the advice before it's relied on, and telling users that AI is involved.",
+    "Only a requirement to use the most capable Claude model for every answer.",
+    "A ban on all insurance-related use, since insurance advice is one of the categories the Usage Policy prohibits for any purpose."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Anthropic's Usage Policy treats consumer-facing advice in areas such as healthcare, insurance, legal and finance as high-risk. Those uses require a qualified human in the loop and disclosure that AI is being used (B). A privacy policy alone isn't enough (A). Model choice isn't the requirement (C). Insurance use isn't banned (D)."
+  },
+  {
+   "id": "D5-034",
+   "domain": 5,
+   "select": 1,
+   "stem": "A company's legal team asks whether prompts and outputs sent through the commercial Claude API will be used to train Anthropic's models. What is the accurate starting point?",
+   "options": [
+    "Yes, all API traffic is used for training unless the company pays for a premium plan.",
+    "Under the commercial terms, inputs and outputs aren't used for training by default; confirm the details in the contract.",
+    "Only outputs are used for training; inputs are never stored or used.",
+    "It depends on the model chosen; smaller models are trained on customer data."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Anthropic's commercial terms say customer API data isn't used to train models by default. The legal team should still confirm retention and use terms in the actual agreement (B). There's no pay-to-opt-out arrangement (A). Inputs and outputs aren't treated differently in that way (C), and it doesn't depend on model size (D)."
+  },
+  {
+   "id": "D5-035",
+   "domain": 5,
+   "select": 1,
+   "stem": "A hiring team wants to check whether its résumé-screening assistant treats candidates fairly. Which test is most informative?",
+   "options": [
+    "Ask the model whether it is biased, and record its answer in the compliance file.",
+    "Run the same résumés with only the name or other group signals changed, and compare the outcomes.",
+    "Remove names from résumés and assume the outcomes are fair from then on.",
+    "Check that the assistant's overall pass rate is close to the human screening team's historical pass rate for the same roles."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Counterfactual tests, with identical résumés where only group signals such as names differ, show directly whether those signals change the outcome (B). The model can't reliably report its own bias (A). Removing names doesn't remove other signals, such as schools or clubs (C). Matching the historical rate can copy past bias (D)."
+  },
+  {
+   "id": "D5-036",
+   "domain": 5,
+   "select": 2,
+   "stem": "An agent writes code changes for a payments service. The team wants to prevent a single faulty or manipulated run from reaching production. Which TWO controls matter most?",
+   "options": [
+    "The agent can't approve or merge its own changes; a person must review and approve them.",
+    "Production deployment requires the normal pipeline checks and can't be triggered by the agent directly.",
+    "The agent is told in its prompt to be extra careful with payment code.",
+    "The agent writes longer commit messages, so reviewers understand its changes.",
+    "The agent runs on a faster model, so changes are finished before the end of the day."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Separation of duties means the agent that writes the change can't also approve it (A) or push it to production on its own (B). Both hold even if the agent is wrong or manipulated. A prompt request (C), better commit messages (D) or speed (E) don't stop a bad change."
+  },
+  {
+   "id": "D5-037",
+   "domain": 5,
+   "select": 1,
+   "stem": "A public chatbot is free to use. One user writes a script that sends 50,000 long requests in an hour, running up a large API bill. What control prevents this?",
+   "options": [
+    "A notice in the terms of service saying that automated use is not allowed.",
+    "Per-user and per-IP rate limits and spending caps, enforced in the app's backend.",
+    "A longer system prompt telling the model to refuse any requests that look like they come from a script.",
+    "Raising the account's API spending limit, so that the service keeps running."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Abuse that runs up costs, sometimes called denial of wallet, is stopped with limits enforced in code: requests and tokens per user or IP, plus spending caps (B). Terms of service don't stop a script (A). The model can't reliably spot automation, and every request still costs money (C). A higher limit makes the bill bigger (D)."
+  },
+  {
+   "id": "D5-038",
+   "domain": 5,
+   "select": 1,
+   "stem": "A community forum uses Claude to draft replies to user posts. Some posts contain hate speech or illegal content. What is a sensible first line of defense?",
+   "options": [
+    "Let Claude draft replies to everything, since it will refuse on its own to repeat any harmful content it sees.",
+    "Screen incoming posts with a fast, inexpensive classifier, and route flagged posts to moderators.",
+    "Delete any post longer than 500 words, since long posts are more likely to be harmful.",
+    "Block all posts that contain any negative words, such as 'hate' or 'kill.'"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A quick, cheap screening step catches problem content before it reaches the main workflow and sends it to people who can handle it properly (B). Relying on the drafting model alone mixes jobs and leaves gaps (A). Length isn't a signal of harm (C). Keyword blocking catches harmless posts and misses disguised ones (D)."
+  },
+  {
+   "id": "D5-039",
+   "domain": 5,
+   "select": 1,
+   "stem": "A consultancy wants to send its clients' customer data to Claude to generate analysis. What must be in place before any client data is sent?",
+   "options": [
+    "Nothing, since the consultancy already has the data on its own servers.",
+    "The client's contract must allow sharing with this processor, with the right data-processing terms in place.",
+    "A note in the consultancy's own privacy policy saying that AI tools may be used.",
+    "Encryption of the data at rest on the consultancy's laptops."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Holding a client's data doesn't mean you may share it with another processor. The client agreement must permit it, with appropriate data-processing terms covering the provider (B). Possession isn't permission (A). The consultancy's own policy doesn't bind its clients' data (C). Encryption at rest doesn't address the sharing (D)."
+  },
+  {
+   "id": "D5-040",
+   "domain": 5,
+   "select": 1,
+   "stem": "A support assistant stores every conversation forever 'in case it's useful later.' Conversations include addresses, order details and sometimes health information. What should the team set up?",
+   "options": [
+    "Keep everything forever, but encrypt the storage so the data is protected.",
+    "A retention policy with a defined period by data type, automatic deletion, and a way to handle deletion requests.",
+    "Delete all conversations immediately, so that nothing at all is ever stored.",
+    "Move old conversations to a cheaper storage system after one year."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Keep data only as long as there's a reason, with periods set by data type, automatic deletion, and a process for people's deletion requests (B). Encryption protects data but doesn't limit how long you hold it (A). Deleting immediately removes what's needed for support, audits and evals (C). Cheaper storage is still storage (D)."
+  },
+  {
+   "id": "D5-041",
+   "domain": 5,
+   "select": 1,
+   "stem": "A bank requires a full review board meeting for every change to its AI systems. Simple wording fixes now take six weeks, so teams avoid making small improvements. What is a better governance approach?",
+   "options": [
+    "Remove the review board, so that teams can ship any change immediately.",
+    "Tier changes by risk: low-risk edits pass automated eval gates, and high-risk changes go to the board.",
+    "Keep the board, and have it meet daily instead of weekly.",
+    "Freeze the AI systems entirely, so that no review is ever needed."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Risk-based tiering puts heavy review where it matters, such as changes to decision logic, tools or data access, while routine edits move quickly with automated checks (B). Removing the board removes oversight (A). Daily meetings add cost without fixing the bottleneck (C). Freezing stops needed fixes (D)."
+  },
+  {
+   "id": "D5-042",
+   "domain": 5,
+   "select": 1,
+   "stem": "A company is planning eight AI use cases, from an internal meeting-notes summarizer to an assistant that recommends loan approvals. How should it decide how much governance each one needs?",
+   "options": [
+    "Apply the strictest controls to all eight, so that none of them is under-protected.",
+    "Rate each by impact: who's affected, how severe a mistake would be, and whether it's reversible, then scale controls.",
+    "Apply the same light controls to all eight, since they all use the same model.",
+    "Let each project team decide on its own controls, without any central guidance."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A risk assessment by impact, such as affected people, harm if wrong, reversibility and regulation, lets controls match the stakes. The loan recommender gets far more than the notes summarizer (B). Maximum controls everywhere waste effort and slow low-risk work (A). The same model doesn't mean the same risk (C). No guidance leads to uneven protection (D)."
+  },
+  {
+   "id": "D5-043",
+   "domain": 5,
+   "select": 1,
+   "stem": "An insurer uses Claude to help decide which claims to deny. Regulations give customers the right to challenge automated decisions. What must the design include?",
+   "options": [
+    "A notice that decisions are final and can't be challenged once they are made.",
+    "A way for customers to request human review, with a reviewer who can see the case and change the decision.",
+    "An option for the customer to ask the AI to reconsider its own decision.",
+    "A rule that only claims under $1,000 can be denied with AI involved."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Contesting an automated decision means a person with real authority reviews it, with access to the case facts and the system's inputs and output (B). Final decisions with no appeal break the requirement (A). Asking the same AI to reconsider isn't human review (C). An arbitrary amount doesn't satisfy the right to challenge (D)."
+  },
+  {
+   "id": "D5-044",
+   "domain": 5,
+   "select": 1,
+   "stem": "An audit finds employees pasting confidential contract text into personal AI chat accounts to summarize it faster. What response best reduces this risk?",
+   "options": [
+    "Send an email to all staff reminding them that confidential client data must never be pasted into any AI tool, personal or otherwise.",
+    "Provide an approved enterprise AI tool with proper data terms, plus a clear policy and data-loss controls.",
+    "Block all AI websites on the company network, including any approved enterprise tools.",
+    "Ask employees to remove client names before pasting text into personal accounts."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "People turn to unapproved tools when they lack approved ones. A sanctioned tool with the right data protections, a clear policy and technical controls removes the need and catches leaks (B). A reminder alone rarely changes behavior (A). Blocking everything pushes use to personal phones (C). Removing names still leaks confidential content (D)."
+  },
+  {
+   "id": "D5-045",
+   "domain": 5,
+   "select": 2,
+   "stem": "An enterprise is rolling out Claude to 5,000 employees. Which TWO administrative controls matter most for security and oversight?",
+   "options": [
+    "Sign-in through the company's identity provider, with accounts added and removed automatically.",
+    "Admin audit logs and usage reports, so the security team can review access and activity.",
+    "Letting each employee create their own account with a personal email address.",
+    "Sharing one admin account among the IT team, so access is never blocked by absences.",
+    "Turning off all logging, so that employee privacy is fully protected."
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "explanation": "Single sign-on with automatic provisioning and removal ensures only current employees have access (A). Audit logs and usage reports give the oversight security needs (B). Personal accounts escape company control (C). A shared admin account hides who did what (D). No logging removes oversight entirely (E)."
+  },
+  {
+   "id": "D6-033",
+   "domain": 6,
+   "select": 1,
+   "stem": "You're starting an AI project in a large company. The sponsor and the IT team are on board. Three months in, the security team and the works council block the launch over issues no one raised earlier. What should have been done at the start?",
+   "options": [
+    "Keep the project quiet until it was finished, so that no group could slow it down.",
+    "Map every group that can approve or block it, such as security, legal, privacy and staff representatives, and involve them early.",
+    "Ask the sponsor to overrule any group that raises concerns late in the project.",
+    "Build the project outside the company network to avoid security reviews."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A stakeholder map at kickoff names everyone with approval or veto power, so their requirements shape the design instead of blocking the launch (B). Secrecy makes the late block worse (A). Overruling security or staff representatives is rarely possible or wise (C). Working around security creates real risk (D)."
+  },
+  {
+   "id": "D6-034",
+   "domain": 6,
+   "select": 1,
+   "stem": "A sponsor wants the assistant to be 'faster, cheaper and more accurate' all at once. Your tests show the most accurate setup is also the slowest and most expensive. How should you present this?",
+   "options": [
+    "Promise all three improvements, then decide later which one to quietly give up.",
+    "Show two or three concrete options with their measured accuracy, cost and speed, and ask which matters most.",
+    "Pick the option you think is best yourself, and present it to the sponsor as the only setup that's technically possible.",
+    "Tell the sponsor that the trade-off is too technical to explain in detail."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Make the trade-off concrete: a few real options, each with measured numbers, let the sponsor decide based on business priorities (B). Overpromising damages trust (A). Hiding options takes the decision away from the person who owns it (C). The trade-off can be explained in plain terms (D)."
+  },
+  {
+   "id": "D6-035",
+   "domain": 6,
+   "select": 1,
+   "stem": "A demo of a contract assistant impressed executives using five hand-picked contracts. They now expect launch next week. What should you do?",
+   "options": [
+    "Launch next week, since the demo proved that the system works.",
+    "Explain that the demo wasn't representative, and share eval results on real contracts plus the steps to launch.",
+    "Run the same demo again for a wider audience, so that more people see it working.",
+    "Delay the launch indefinitely without explaining why."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Demos show what's possible on chosen examples. Set expectations with results on a realistic sample, including failures, and a clear plan to production (B). Launching on demo evidence risks a public failure (A). More demos reinforce the wrong impression (C). An unexplained delay damages trust (D)."
+  },
+  {
+   "id": "D6-036",
+   "domain": 6,
+   "select": 1,
+   "stem": "Users of a claims assistant correct its drafts every day. The corrections are saved, but no one looks at them. What process turns this into improvement?",
+   "options": [
+    "Delete the corrections each month to save storage space.",
+    "Review the corrections regularly, add representative ones to the eval set, and use them to target fixes.",
+    "Fine-tune a new model every night on all of the corrections.",
+    "Show all of the saved corrections to the model in every future request, so that it learns from them automatically over time."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "User corrections show real failures. Reviewing them, adding good examples to the eval set and fixing the causes closes the feedback loop (B). Deleting them wastes the signal (A). Nightly fine-tuning is costly and unreviewed (C). Adding every correction to each request would bloat the context and wouldn't scale (D)."
+  },
+  {
+   "id": "D6-037",
+   "domain": 6,
+   "select": 1,
+   "stem": "An assistant launched four months ago. The project team moved on, and the business owner only hears about problems when customers complain. What ongoing practice should be set up?",
+   "options": [
+    "A yearly review of the system, held at the start of each budget cycle.",
+    "A regular review with the business owner covering quality metrics, cost, incidents and planned changes.",
+    "A rule that issues are discussed only when a customer formally complains.",
+    "A dashboard that tracks only the total number of conversations each day."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A regular operating review, monthly for example, with clear owners, quality and cost trends, incidents and upcoming changes such as model updates, keeps the system healthy (B). A yearly review is too slow (A). Waiting for complaints means reacting too late (C). Volume alone says nothing about quality (D)."
+  },
+  {
+   "id": "D6-038",
+   "domain": 6,
+   "select": 1,
+   "stem": "Next week's update will change how the assistant formats answers and add a new data source. How should users be told?",
+   "options": [
+    "Don't tell users, since they will notice the changes on their own.",
+    "Send short release notes before the change saying what's different, why, and where to report problems.",
+    "Send all users a detailed technical document describing the new model settings, prompt changes and the new data source's schema.",
+    "Tell users only if they complain about the new behavior."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Short, plain release notes ahead of time explain what will change and where to send feedback, which reduces confusion and support tickets (B). Silent changes surprise users (A). Technical detail isn't useful to most users (C). Waiting for complaints damages trust (D)."
+  },
+  {
+   "id": "D6-039",
+   "domain": 6,
+   "select": 1,
+   "stem": "An executive wants to skip evaluation entirely to hit a launch date in two weeks. What is the best response?",
+   "options": [
+    "Agree, and plan to build evaluations after launch if any problems come up.",
+    "Propose a small eval on the highest-risk cases plus a limited launch with clear rollback criteria.",
+    "Refuse to launch until a full eval suite of several thousand cases has been built, run and reviewed, however long that takes.",
+    "Escalate to the CEO immediately, without offering any alternative plan."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Offer a path that meets the date while managing risk: a focused eval on the riskiest cases and a limited first rollout with agreed rollback triggers (B). Skipping evaluation entirely risks a public failure (A). Insisting on everything ignores a real business constraint (C). Escalating without options isn't constructive (D)."
+  },
+  {
+   "id": "D6-040",
+   "domain": 6,
+   "select": 1,
+   "stem": "Loan officers start using an assistant that summarizes applications. What training matters most for them?",
+   "options": [
+    "How large language models work internally, including attention, transformers and how they are trained on text.",
+    "What it does well, where it's known to make mistakes, and how to check its summaries quickly.",
+    "How to write prompts from scratch for every possible type of question.",
+    "How to turn the assistant off whenever it gives a wrong answer."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Users need practical knowledge: strengths, known failure patterns and a quick way to verify outputs, so they rely on it appropriately (B). Model internals don't help daily use (A). Prompt-writing skill matters less when the app already handles the prompt (C). Turning it off doesn't teach them to use it well (D)."
+  },
+  {
+   "id": "D6-041",
+   "domain": 6,
+   "select": 1,
+   "stem": "A requirement says 'The assistant should give accurate answers about benefits.' How should it be rewritten so the team can test it?",
+   "options": [
+    "'The assistant should give highly accurate answers about all benefits topics.'",
+    "'On the 300-question benefits eval set, at least 95% of answers are correct and none give wrong eligibility facts.'",
+    "'The assistant should give answers that users are happy with most of the time.'",
+    "'The assistant should be as accurate as the best human benefits expert.'"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Testable acceptance criteria name the test set, the measure and the threshold, including zero tolerance for the most harmful error (B). 'Highly accurate' (A) and 'happy most of the time' (C) can't be checked. 'As accurate as the best expert' has no defined test (D)."
+  },
+  {
+   "id": "D6-042",
+   "domain": 6,
+   "select": 1,
+   "stem": "Procurement asks why the team chose Claude through Amazon Bedrock instead of the direct Claude API. Which explanation is most useful?",
+   "options": [
+    "'Bedrock always has every new Claude feature first, so it is the more capable option.'",
+    "'We already have AWS contracts, billing and data controls, so Bedrock fits; we checked the features we need are available there.'",
+    "'The direct API is less secure than Bedrock, so it can't be used by large companies.'",
+    "'The choice doesn't matter, since both platforms are identical in every way.'"
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Explain the decision in procurement's terms: existing contracts, billing, compliance and data controls, plus a check that the needed features are available, since new features can reach the direct API first (B). (A) is often the reverse. The direct API isn't insecure (C). The platforms differ in some features and operations (D)."
+  },
+  {
+   "id": "D6-043",
+   "domain": 6,
+   "select": 1,
+   "stem": "A company is retiring an internal assistant that a new system will replace. What does a responsible shutdown include?",
+   "options": [
+    "Turning it off on a Friday evening without notice, so that users are pushed to switch to the new system over the weekend.",
+    "Telling users the date and the alternative in advance, moving needed data or workflows, and deleting data per policy.",
+    "Leaving it running indefinitely next to the new system, so that users can choose.",
+    "Deleting all of its data immediately, including records the company must keep."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Retirement needs notice, a clear alternative, migration of needed workflows or data, and handling of stored data under the retention policy (B). A surprise shutdown disrupts work (A). Running both indefinitely doubles cost and confusion (C). Deleting records that must be kept can break legal requirements (D)."
+  },
+  {
+   "id": "D6-044",
+   "domain": 6,
+   "select": 1,
+   "stem": "Halfway through the quarter, the assistant's model spending is 40% over budget because usage grew faster than expected. How should you report it?",
+   "options": [
+    "Wait until the end of the quarter, in case usage happens to fall again.",
+    "Report it now with the cause and options, such as caching, a smaller model for simple requests, or shorter outputs, with savings for each.",
+    "Cut the service off for some users without telling them, to stay within the budget.",
+    "Report only the total overspend, and let finance decide what to cut."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Raise budget problems early, explain what's driving them, and bring costed options so the business can choose (B). Waiting makes it worse (A). Quietly cutting users off is a business decision taken without the business (C). A number without options leaves finance guessing (D)."
+  },
+  {
+   "id": "D6-045",
+   "domain": 6,
+   "select": 1,
+   "stem": "A customer escalates after the assistant told them a fee would be waived, which contradicts the official policy. The service director asks for an explanation. What is the best response?",
+   "options": [
+    "Say that AI systems sometimes make mistakes like this, that it was a one-off, and that nothing can really be done to prevent it.",
+    "Explain the cause found in the logs, the immediate fix, how you'll prevent it, and how the customer is being handled.",
+    "Blame the customer for wording their question in a confusing way.",
+    "Promise that the assistant will never make a mistake again from now on."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "A good incident explanation covers what happened (from the logs, such as an outdated policy chunk being retrieved), what was done right away, what prevents a repeat (fixing the index and adding the case to evals), and how the customer is being taken care of (B). Saying nothing can be done (A), blaming the user (C) or promising perfection (D) don't build trust."
+  },
+  {
+   "id": "D7-016",
+   "domain": 7,
+   "select": 1,
+   "stem": "Developers on a team keep typing the same multi-step instructions to have Claude Code write release notes from recent commits. What is the best way to share this workflow?",
+   "options": [
+    "Post the instructions on the team wiki, and ask developers to copy and paste them into Claude Code whenever they need them.",
+    "Add a project skill or custom slash command in the repository's .claude folder that everyone can run.",
+    "Ask each developer to save the instructions in their own personal settings file.",
+    "Add the full instructions to the beginning of every file in the repository."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Workflows checked into the repo's .claude folder, as a skill or custom slash command, are shared, versioned with the code, and run the same way for everyone (B). Copying from a wiki is manual and drifts (A). Personal settings aren't shared (C). Instructions in every file clutter the code and context (D)."
+  },
+  {
+   "id": "D7-017",
+   "domain": 7,
+   "select": 1,
+   "stem": "A repository's CLAUDE.md has grown to 2,000 lines, including full API references and old meeting notes. Claude Code now misses some important rules in it. What should the team do?",
+   "options": [
+    "Add a line at the top saying that every rule in the file is important.",
+    "Keep CLAUDE.md short with key commands and rules, and move long references into separate files it points to with @imports.",
+    "Repeat the most important rules several times throughout the 2,000 lines.",
+    "Delete CLAUDE.md completely and rely on Claude Code to read the code."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "CLAUDE.md is loaded into every session, so it should be short and focused. Long reference material can live in separate files linked with @path imports, or simply be read when needed (B). A note saying everything is important doesn't help (A). Repeating rules adds to the bloat (C). Deleting it loses the key rules (D)."
+  },
+  {
+   "id": "D7-018",
+   "domain": 7,
+   "select": 1,
+   "stem": "A developer wants three Claude Code sessions working in parallel on separate features in the same repository, without the sessions overwriting each other's files. What is the standard approach?",
+   "options": [
+    "Run all three sessions in the same folder, and ask each session to edit different files.",
+    "Use separate git worktrees, so each session works in its own folder on its own branch.",
+    "Run the sessions one after another, never at the same time.",
+    "Copy the repository three times by hand, and merge the copies back later without using git."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Git worktrees give each session its own working folder and branch from the same repository, so parallel sessions can't step on each other's files (B). Sharing one folder invites conflicts (A). Running in sequence loses the parallelism (C). Manual copies outside git make merging painful (D)."
+  },
+  {
+   "id": "D7-019",
+   "domain": 7,
+   "select": 1,
+   "stem": "A team wants developers to be able to write '@claude fix the failing test' in a pull request comment and have Claude Code make the change on that branch. What should they set up?",
+   "options": [
+    "A chat bot that copies the PR comment into a developer's local terminal session.",
+    "The Claude Code GitHub Action in the repository, triggered by mentions in issues and pull requests.",
+    "A nightly script that reads all new PR comments, runs Claude Code on each one, and replies to them the next morning.",
+    "A rule in CLAUDE.md telling Claude Code to watch GitHub for new comments."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "The Claude Code GitHub Action responds to @claude mentions in issues and PRs and can make commits on the branch, within the permissions you configure (B). Copying comments into a local terminal (A) or a nightly script (C) isn't the same workflow. CLAUDE.md can't make Claude Code watch GitHub (D)."
+  },
+  {
+   "id": "D7-020",
+   "domain": 7,
+   "select": 1,
+   "stem": "A CI script runs Claude Code in headless mode and then tries to read the result with a regular expression that keeps breaking on different wording. What is the better approach?",
+   "options": [
+    "Ask Claude Code in the prompt to always reply using exactly the same sentence.",
+    "Use the JSON output format option, and read the result fields from the JSON.",
+    "Save the output to a file and have a person read it after each CI run.",
+    "Run the same command twice and keep whichever output the regex can parse."
+   ],
+   "answer": [
+    1
+   ],
+   "explanation": "Headless mode can output JSON, which gives structured fields such as the result and cost that scripts can parse reliably (B). Asking for fixed wording is fragile (A). Manual reading defeats CI automation (C). Running twice doubles the cost and still may not parse (D)."
   }
  ]
 }
