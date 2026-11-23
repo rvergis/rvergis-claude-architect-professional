@@ -10,7 +10,7 @@ Unofficial study material, not affiliated with or endorsed by Anthropic. Every q
 - Supports both exam-guide versions, picked on the home page (the default follows the date):
   - **v1.0** (exams through Dec 6, 2026): 63 items, all scored.
   - **v1.1** (exams from Dec 7, 2026): 70 items, of which 10 are unscored trial items revealed only in the results.
-- Four item formats: single answer, multiple response (always "choose TWO"), Yes/No sets (three statements, each with a Yes/No drop-down) and matching (three items, each matched to a lettered choice from a drop-down).
+- Four item formats: single answer, multiple response (always "choose TWO"), Yes/No sets (three statements, each with a Yes/No drop-down) and matching (three items, each matched to a lettered choice from a drop-down). Every full exam includes 2–4 Yes/No and 2–4 matching items.
 - 120-minute timer labeled "Time remaining" and a "Question N of M" counter in the top bar. A timed exam keeps running in a background tab, as the real one does; Save & exit pauses it.
 - **100 fixed practice forms.** A form number always produces the same questions and option order, so it can be retaken. Random forms and per-domain drills are also available.
 - Scores items all-or-nothing (every option or row must be right) and breaks results down by domain. Every wrong option has an explanation.
