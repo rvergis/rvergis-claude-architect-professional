@@ -1,5 +1,5 @@
 {
- "version": "2.0.0",
+ "version": "2.1.0",
  "generated": "2026-11-23",
  "exam": "CCAR-P",
  "minutes": 120,
@@ -1195,6 +1195,69 @@
    "select": 1
   },
   {
+   "id": "D1-064",
+   "domain": 1,
+   "type": "match",
+   "stem": "An architect is reviewing three proposed Claude features for a logistics company. Match each feature to the architecture pattern that fits it best.",
+   "choices": [
+    "A fixed, code-defined workflow of model calls",
+    "An autonomous agent with tools",
+    "A single model call with structured output",
+    "Retrieval-augmented generation over a document index"
+   ],
+   "rows": [
+    "Extract shipper, consignee, weight and incoterms from each scanned bill of lading into the ERP's schema.",
+    "Answer drivers' questions from 4,000 pages of safety and route procedures that change monthly.",
+    "Investigate a delayed shipment by checking tracking, warehouse logs and carrier messages, where the next step depends on what each source shows."
+   ],
+   "answer": [
+    2,
+    3,
+    1
+   ],
+   "explanation": "Row 1: pulling fixed fields from one document into a schema is a single call with structured output (C). Row 2: answering from a large, changing document set calls for retrieval over an index (D). Row 3: an investigation whose next step depends on what it finds is the case where an agent earns its cost (B). A fixed workflow (A) fits multi-step processes whose steps are known in advance, which none of these is."
+  },
+  {
+   "id": "D1-065",
+   "domain": 1,
+   "type": "yesno",
+   "stem": "A university wants a Claude-based assistant that answers students' questions about financial aid. Aid rules are in 300 policy pages, each student's award is in the student information system, and decisions about appeals are made by aid officers. For each design decision, select Yes if it is sound.",
+   "statements": [
+    "The assistant retrieves policy text to answer general questions and calls a tool for the signed-in student's own award details.",
+    "The assistant decides financial-aid appeals itself when the student's explanation is persuasive, to reduce the officers' backlog.",
+    "Questions the assistant can't answer from policy or the student's record are routed to an aid officer with the conversation attached."
+   ],
+   "answer": [
+    true,
+    false,
+    true
+   ],
+   "explanation": "Statement 1: Yes. General rules come from retrieval, and personal data comes from a tool scoped to the authenticated student. Statement 2: No. Appeal decisions belong to aid officers; the assistant can summarize an appeal but shouldn't decide it. Statement 3: Yes. A clear escalation path with context is part of a sound design."
+  },
+  {
+   "id": "D1-066",
+   "domain": 1,
+   "type": "match",
+   "stem": "A team is writing non-functional requirements for a contract-review assistant. Match each stakeholder concern to the requirement that best captures it.",
+   "choices": [
+    "p95 time to first token under 2 seconds, measured at the client",
+    "Every finding cites the clause it is based on",
+    "Monthly model and infrastructure cost under an agreed budget per contract",
+    "Contract text is processed only in the client's approved cloud region"
+   ],
+   "rows": [
+    "The general counsel says lawyers won't trust a finding they can't check quickly against the contract.",
+    "The CFO wants to know the assistant will stay affordable as contract volume triples next year.",
+    "The data protection officer says client contracts can't leave the EU."
+   ],
+   "answer": [
+    1,
+    2,
+    3
+   ],
+   "explanation": "Row 1: trust through quick checking becomes a citation requirement (B). Row 2: affordability at growing volume becomes a cost-per-contract budget (C). Row 3: the EU restriction becomes a processing-region requirement (D). The latency requirement (A) is a valid non-functional requirement, but none of these three stakeholders raised speed."
+  },
+  {
    "id": "D2-001",
    "domain": 2,
    "select": 1,
@@ -1992,6 +2055,46 @@
     true
    ],
    "explanation": "Statement 1: Yes. Giving the reason behind an instruction helps the model apply it sensibly in cases the rule doesn't spell out. Statement 2: No. Separating instructions, reference material and the question with clear structure such as tags makes it easier for the model to tell them apart. Statement 3: Yes. Varied examples, including the escalation case, teach the pattern without the model copying one example's surface form."
+  },
+  {
+   "id": "D2-048",
+   "domain": 2,
+   "type": "match",
+   "stem": "A prompt engineer is diagnosing three problems with a claims-summary prompt. Match each symptom to the prompt change most likely to fix it.",
+   "choices": [
+    "Give the model a clear output structure, such as tagged sections or a schema",
+    "Add varied examples and explain what they have in common",
+    "Explain the purpose behind the rule and who reads the output",
+    "Move the claim documents into tagged sections separate from the instructions"
+   ],
+   "rows": [
+    "Summaries follow the instruction 'be concise' so strictly that they leave out the deductible, which adjusters need.",
+    "The model sometimes treats text inside a claimant's letter, such as 'please approve this quickly,' as if it were an instruction.",
+    "Downstream code fails because the summary's sections appear in a different order and with different headings each time."
+   ],
+   "answer": [
+    2,
+    3,
+    0
+   ],
+   "explanation": "Row 1: a bare rule applied too literally is fixed by explaining why concision matters and what adjusters must still see (C). Row 2: confusing document content with instructions is fixed by clearly separating the documents into tagged sections (D). Row 3: inconsistent structure is fixed with an explicit output structure or schema (A). Varied examples (B) help when outputs copy one example too closely, which isn't the problem here."
+  },
+  {
+   "id": "D2-049",
+   "domain": 2,
+   "type": "yesno",
+   "stem": "A team uses Claude to draft responses to customer reviews. They want replies to match their brand voice: warm, brief and never defensive. For each prompting choice, select Yes if it is likely to help.",
+   "statements": [
+    "Describe the brand voice and give three or four example replies that vary in situation and length.",
+    "Tell the model it is 'the world's greatest copywriter' so the replies sound more polished.",
+    "Tell the model who reads the replies and why defensiveness hurts the brand, such as potential customers comparing businesses."
+   ],
+   "answer": [
+    true,
+    false,
+    true
+   ],
+   "explanation": "Statement 1: Yes. A clear description plus varied examples teaches the voice without the model copying one example. Statement 2: No. Grandiose role statements add little; describing the task, audience and standard does more. Statement 3: Yes. Explaining the audience and the reason behind the tone helps the model apply it in new situations."
   },
   {
    "id": "D3-001",
@@ -3223,6 +3326,69 @@
    "select": 1
   },
   {
+   "id": "D3-073",
+   "domain": 3,
+   "type": "match",
+   "stem": "A team is choosing how to bring company data into a Claude-based assistant. Match each data source to the best integration approach.",
+   "choices": [
+    "Include the content in the prompt as a cached prefix",
+    "Retrieve relevant chunks from a search index",
+    "Call a tool that queries the live system at request time",
+    "Fine-tune a model on the content"
+   ],
+   "rows": [
+    "A 25-page style guide that every request needs and that changes twice a year.",
+    "Each customer's current order status, which changes many times a day.",
+    "A 2-million-document archive of past support tickets, of which a few are relevant to any question."
+   ],
+   "answer": [
+    0,
+    2,
+    1
+   ],
+   "explanation": "Row 1: small, stable content needed on every request fits in the prompt, with caching to cut cost (A). Row 2: fast-changing, per-customer data should come from a tool that queries the live system (C). Row 3: a huge archive where a few documents matter calls for retrieval from an index (B). Fine-tuning (D) is a poor way to supply facts that need to be current or citable."
+  },
+  {
+   "id": "D3-074",
+   "domain": 3,
+   "type": "yesno",
+   "stem": "A developer is building a tool-using agent on the Messages API. For each statement about tool use, select Yes if it is correct.",
+   "statements": [
+    "When Claude returns several tool_use blocks in one response, all their tool_result blocks go back together in the next user message.",
+    "A clear tool description that says when to use the tool, and when not to, improves how reliably Claude chooses it.",
+    "Claude runs the tools itself on Anthropic's servers, so the application only needs to display the final answer."
+   ],
+   "answer": [
+    true,
+    true,
+    false
+   ],
+   "explanation": "Statement 1: Yes. Every tool_use block in a response must be answered in the next user message, matched by tool_use_id. Statement 2: Yes. Tool descriptions are the main guide for tool choice, so clear scope and boundaries help. Statement 3: No. For client tools, the application runs the tool and returns the result; Claude only requests the call."
+  },
+  {
+   "id": "D3-075",
+   "domain": 3,
+   "type": "match",
+   "stem": "A team is matching Anthropic API features to integration needs. Match each need to the feature that fits it best.",
+   "choices": [
+    "The Message Batches API",
+    "Prompt caching",
+    "Streaming responses",
+    "Structured outputs"
+   ],
+   "rows": [
+    "Users of a chat app complain that they stare at a blank screen for several seconds before anything appears.",
+    "A nightly job classifies 80,000 support emails, and results are needed the next morning.",
+    "An invoice pipeline needs every response to parse as JSON matching a fixed schema."
+   ],
+   "answer": [
+    2,
+    0,
+    3
+   ],
+   "explanation": "Row 1: showing text as it is generated cuts perceived wait time, which is what streaming does (C). Row 2: large jobs that can wait hours fit the Batches API at about half the cost (A). Row 3: guaranteed schema-conformant JSON is what structured outputs provide (D). Prompt caching (B) cuts cost and latency for repeated prefixes, which none of these needs describes."
+  },
+  {
    "id": "D4-001",
    "domain": 4,
    "select": 1,
@@ -4220,6 +4386,69 @@
    "select": 1
   },
   {
+   "id": "D4-060",
+   "domain": 4,
+   "type": "match",
+   "stem": "An evaluation lead is choosing metrics for three Claude features. Match each feature to the most appropriate primary metric.",
+   "choices": [
+    "Recall on the critical class, with precision tracked",
+    "Exact-match field accuracy against labeled documents",
+    "Rubric score from a validated LLM judge",
+    "Latency at p95"
+   ],
+   "rows": [
+    "A classifier that routes suspected fraud reports, where missing a real report is very costly.",
+    "An extraction step that pulls six fields from purchase orders into an ERP.",
+    "A drafting assistant whose replies must be accurate, polite and complete, across thousands of replies a week."
+   ],
+   "answer": [
+    0,
+    1,
+    2
+   ],
+   "explanation": "Row 1: when misses are costly, recall on that class is the primary metric, with precision watched for reviewer load (A). Row 2: fields with one right value are measured by exact-match accuracy against labels (B). Row 3: open-ended quality at volume suits a rubric-based judge validated against human ratings (C). Latency (D) is a guardrail for all three, not the primary measure of whether any of them does its job."
+  },
+  {
+   "id": "D4-061",
+   "domain": 4,
+   "type": "yesno",
+   "stem": "A team is building the evaluation set for a new policy-question assistant before launch. For each practice, select Yes if it is sound.",
+   "statements": [
+    "Include questions the policies don't answer, with the expected behavior being to say so and escalate.",
+    "Use the same examples in the prompt's few-shot section and in the evaluation set, since they are the best-reviewed examples available.",
+    "Version the evaluation set and record which version produced each reported score."
+   ],
+   "answer": [
+    true,
+    false,
+    true
+   ],
+   "explanation": "Statement 1: Yes. Testing unanswerable questions checks that the assistant doesn't invent answers. Statement 2: No. Examples used in the prompt must be held out of the evaluation set, or scores overstate real performance. Statement 3: Yes. Versioning the set makes scores comparable over time and changes traceable."
+  },
+  {
+   "id": "D4-062",
+   "domain": 4,
+   "type": "match",
+   "stem": "A team wants to cut the cost of a Claude-based document assistant without hurting quality. Match each finding to the optimization it points to.",
+   "choices": [
+    "Cache the long, stable instruction block",
+    "Route simple requests to a smaller model, confirmed on evals",
+    "Ask for shorter outputs that match what users read",
+    "Move the work to the Batches API"
+   ],
+   "rows": [
+    "Every request repeats the same 9,000-token instructions, and input tokens are most of the bill.",
+    "Users read only the first paragraph of summaries that average 700 words.",
+    "Seventy percent of requests are simple lookups that a smaller model handles as well on the eval set."
+   ],
+   "answer": [
+    0,
+    2,
+    1
+   ],
+   "explanation": "Row 1: a large repeated prefix that dominates input cost is the case for prompt caching (A). Row 2: paying for 700 words when users read one paragraph points to shorter outputs, checked against quality (C). Row 3: a large share of simple requests that a smaller model handles equally well points to routing (B). Batch processing (D) suits work that can wait hours, and nothing here says these requests can."
+  },
+  {
    "id": "D5-001",
    "domain": 5,
    "select": 2,
@@ -5160,6 +5389,69 @@
    "select": 1
   },
   {
+   "id": "D5-055",
+   "domain": 5,
+   "type": "match",
+   "stem": "A risk lead is matching risks in an HR assistant to their primary mitigation. Match each risk to the control that addresses it most directly.",
+   "choices": [
+    "Run tool queries under the requesting user's own permissions",
+    "Redact personal data before logs are written, with a retention limit",
+    "Require human approval for the action, enforced in code",
+    "Treat retrieved documents as untrusted data and limit what tools can do"
+   ],
+   "rows": [
+    "A manager asks the assistant for a colleague's salary and receives it because the assistant's service account can read all HR records.",
+    "A policy document edited by an employee contains hidden text telling the assistant to email the org chart outside the company.",
+    "The assistant can submit termination paperwork, and an error would harm an employee."
+   ],
+   "answer": [
+    0,
+    3,
+    2
+   ],
+   "explanation": "Row 1: data exposure through a broad service account is fixed by querying with the requester's own permissions (A). Row 2: instructions hidden in a document are an injection risk, handled by treating content as data and restricting what tools can do (D). Row 3: a high-impact, hard-to-reverse action needs human approval enforced in code (C). Log redaction (B) protects personal data in logs, which isn't the risk in any of these three."
+  },
+  {
+   "id": "D5-056",
+   "domain": 5,
+   "type": "yesno",
+   "stem": "A company is drafting an acceptable-use policy for employees using Claude through its enterprise account. For each policy statement, select Yes if it is a sound policy statement.",
+   "statements": [
+    "Employees may use the enterprise account for client work; personal AI accounts must not be used for confidential data.",
+    "Employees remain responsible for checking AI-assisted work before it is sent to clients or used in decisions.",
+    "Because the enterprise account has strong data terms, employees can paste any data into it without considering classification rules."
+   ],
+   "answer": [
+    true,
+    true,
+    false
+   ],
+   "explanation": "Statement 1: Yes. Pointing confidential work to the approved tool, and away from personal accounts, is the core of a usable policy. Statement 2: Yes. Human accountability for AI-assisted work is a standard and necessary rule. Statement 3: No. Good vendor terms don't replace data classification rules; some data may still be restricted."
+  },
+  {
+   "id": "D5-057",
+   "domain": 5,
+   "type": "match",
+   "stem": "A governance team is assigning oversight levels to three Claude use cases at an insurer. Match each use case to the most appropriate level of human oversight.",
+   "choices": [
+    "Fully automated, with sampled quality review",
+    "Human review of every output before it takes effect",
+    "Not suitable for automation with current controls",
+    "Automated with automatic escalation of flagged cases"
+   ],
+   "rows": [
+    "Suggesting tags for internal knowledge-base articles, which editors can change at any time.",
+    "Drafting letters that deny claims, which are sent to customers and can be appealed to a regulator.",
+    "Answering policyholders' routine coverage questions, where a classifier flags complaints and legal threats."
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ],
+   "explanation": "Row 1: low-impact, easily corrected internal tags can run automatically with sampled review (A). Row 2: claim denials affect customers and regulators, so every letter needs human review before it is sent (B). Row 3: routine answers can be automated, with flagged complaints and legal threats escalated to people (D). None of these is so risky that automation is ruled out entirely (C)."
+  },
+  {
    "id": "D6-001",
    "domain": 6,
    "select": 1,
@@ -5950,6 +6242,69 @@
    "select": 1
   },
   {
+   "id": "D6-049",
+   "domain": 6,
+   "type": "match",
+   "stem": "A delivery lead is preparing messages about a Claude-based assistant for three audiences. Match each audience to the framing that serves it best.",
+   "choices": [
+    "Business outcomes against the baseline, risks and the decision needed",
+    "Architecture, evaluation method and known failure modes",
+    "What the tool does, what it doesn't, and how to report problems",
+    "Token counts and model version history"
+   ],
+   "rows": [
+    "The executive sponsor deciding whether to fund a company-wide rollout.",
+    "The frontline staff who will use the assistant from next Monday.",
+    "The client's architecture review board, which must approve the design."
+   ],
+   "answer": [
+    0,
+    2,
+    1
+   ],
+   "explanation": "Row 1: a funding decision needs outcomes against the baseline, risks and a clear ask (A). Row 2: users need to know what the tool does and doesn't do, and how to report problems (C). Row 3: a review board needs the design, how quality is measured and where it can fail (B). Token counts and version history (D) are operational details that none of these audiences needs as the main message."
+  },
+  {
+   "id": "D6-050",
+   "domain": 6,
+   "type": "yesno",
+   "stem": "A pilot of a Claude-based proposal assistant is ending. The client asks for a recommendation on whether to scale it. For each element of your recommendation, select Yes if it belongs in it.",
+   "statements": [
+    "Results against the success metrics agreed at the start of the pilot, including where targets were missed.",
+    "A statement that the assistant will perform better in production because users will get used to it.",
+    "The conditions for scaling, such as owners, monitoring, budget and an evaluation process for future changes."
+   ],
+   "answer": [
+    true,
+    false,
+    true
+   ],
+   "explanation": "Statement 1: Yes. A recommendation should rest on the pre-agreed metrics, reported honestly, including misses. Statement 2: No. It is an unsupported prediction; any expected improvement needs evidence. Statement 3: Yes. Scaling safely needs owners, monitoring, budget and a change process, and the client needs to see them."
+  },
+  {
+   "id": "D6-051",
+   "domain": 6,
+   "type": "match",
+   "stem": "A client is moving a Claude-based assistant from pilot to long-term operation. Match each lifecycle activity to the role that should own it.",
+   "choices": [
+    "The business owner of the process",
+    "The platform or operations team",
+    "The security and compliance team",
+    "The vendor's account team"
+   ],
+   "rows": [
+    "Deciding whether a drop in answer quality on billing questions is acceptable or must be fixed before the next release.",
+    "Watching latency, error rates and cost dashboards, and responding to alerts.",
+    "Reviewing whether a new data source can be connected under the company's data-handling rules."
+   ],
+   "answer": [
+    0,
+    1,
+    2
+   ],
+   "explanation": "Row 1: whether a quality trade-off is acceptable is a business decision for the process owner (A). Row 2: day-to-day monitoring and alert response belong to the platform or operations team (B). Row 3: approving new data sources under data-handling rules is a security and compliance task (C). The vendor's account team (D) supports the client but doesn't own any of these decisions."
+  },
+  {
    "id": "D7-001",
    "domain": 7,
    "select": 1,
@@ -6374,6 +6729,29 @@
    ],
    "explanation": "Rules that must always happen should be enforced by hooks, which run every time, rather than by instructions the model may skip; CI provides a final gate (D). Stronger wording (A) and Skills (B) are still instructions the model can miss. Manual checks (C) move the burden back to people and will also be skipped sometimes.",
    "select": 1
+  },
+  {
+   "id": "D7-026",
+   "domain": 7,
+   "type": "match",
+   "stem": "A team lead is configuring Claude Code for a shared repository. Match each need to the right place to configure it.",
+   "choices": [
+    "The project's committed CLAUDE.md",
+    "A hook in the project's committed settings",
+    "The developer's personal .claude/settings.local.json",
+    "Managed settings deployed by IT"
+   ],
+   "rows": [
+    "Tell every session in the repository which command runs the tests for a single package.",
+    "Run the type checker automatically after every file edit, for everyone on the team.",
+    "Block access to credential files on every developer machine in the company, without exceptions."
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ],
+   "explanation": "Row 1: shared guidance such as the test command belongs in the committed project CLAUDE.md (A). Row 2: something that must happen every time, for everyone, is a hook in the committed project settings (B). Row 3: a company-wide rule that can't be overridden belongs in managed settings (D). Personal local settings (C) are for one developer's overrides and enforce nothing for the team."
   }
  ]
 }

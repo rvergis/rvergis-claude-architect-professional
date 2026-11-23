@@ -198,7 +198,12 @@
     if (opts.mode === "drill") {
       picked = shuffle(pool(ver, opts.domain), r).slice(0, Math.max(1, opts.count));
     } else {
-      bp.domains.forEach(function (d) { picked = picked.concat(shuffle(pool(ver, d.id), r).slice(0, d.items)); });
+      var rest = {};
+      bp.domains.forEach(function (d) {
+        var sh = shuffle(pool(ver, d.id), r);
+        picked = picked.concat(sh.slice(0, d.items)); rest[d.id] = sh.slice(d.items);
+      });
+      balanceFormats(picked, rest, r);
       picked = shuffle(picked, r);
     }
     var items = picked.map(function (q) { return buildItem(q, r); });
@@ -213,6 +218,35 @@
       startedAt: opts.timed && opts.minutes ? Date.now() : null, elapsedBefore: 0,
       items: items, current: 0, submitted: false
     };
+  }
+
+  /* Keep 2-4 Yes/No and 2-4 matching items per full exam, as on the real exam. Swaps stay within a
+     domain, so the blueprint's domain counts don't change. */
+  var FORMAT_MIN = 2, FORMAT_MAX = 4;
+  function balanceFormats(picked, rest, r) {
+    ["yesno", "match"].forEach(function (t) {
+      var count = function () { return picked.filter(function (q) { return qType(q) === t; }).length; };
+      var guard = 0;
+      while (count() < FORMAT_MIN && guard++ < 50) {
+        var cands = [];
+        Object.keys(rest).forEach(function (d) { rest[d].forEach(function (q) { if (qType(q) === t) cands.push(q); }); });
+        if (!cands.length) break;
+        var add = cands[Math.floor(r() * cands.length)];
+        var outs = picked.filter(function (q) { return q.domain === add.domain && qType(q) === "choice"; });
+        if (!outs.length) { rest[add.domain].splice(rest[add.domain].indexOf(add), 1); continue; }
+        var out = outs[Math.floor(r() * outs.length)];
+        picked[picked.indexOf(out)] = add; rest[add.domain].splice(rest[add.domain].indexOf(add), 1, out);
+      }
+      guard = 0;
+      while (count() > FORMAT_MAX && guard++ < 50) {
+        var mine = picked.filter(function (q) { return qType(q) === t; });
+        var drop = mine[Math.floor(r() * mine.length)];
+        var subs = rest[drop.domain].filter(function (q) { return qType(q) === "choice"; });
+        if (!subs.length) break;
+        var sub = subs[Math.floor(r() * subs.length)];
+        picked[picked.indexOf(drop)] = sub; rest[drop.domain].splice(rest[drop.domain].indexOf(sub), 1, drop);
+      }
+    });
   }
 
   function isCorrect(it) {
