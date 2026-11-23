@@ -129,3 +129,4 @@ input[type=number] { width: 110px; }
 .gridrow.wrong { border-color: var(--bad); background: var(--bad-bg); }
 .gridrow .rowans { grid-column: 2 / 4; font-size: .85rem; font-weight: 650; color: var(--ok); }
 @media (max-width: 520px) { .gridrow { grid-template-columns: auto 1fr; } .gridrow select { grid-column: 2; justify-self: start; } .gridrow .rowans { grid-column: 2; } }
+@media (max-width: 420px) { .brand span:not(.mark) { display: none; } }
